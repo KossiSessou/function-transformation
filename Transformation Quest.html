@@ -1,0 +1,3115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transformation Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=STIX+Two+Text:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F2F5FA; --sheet: #FFFFFF; --grid: #E0E7F0; --grid-major: #C6D3E4;
+  --ink: #15223D; --ink-2: #4A5A77;
+  --blue: #0072B2; --blue-soft: #E2EFF8; --on-blue: #FFFFFF;
+  --orange: #E69F00; --orange-ink: #8A5800;
+  --green: #00775A; --green-soft: #DFF2EA;
+  --red: #C24A00; --red-soft: #FBE8DD;
+  --purple: #A24E88; --curve-parent: #8A97AD;
+  --t-shift: var(--blue); --t-flip: var(--red); --t-stretch: var(--green); --t-squeeze: var(--purple);
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-math: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F1B2E; --sheet: #16243D; --grid: #1B2B45; --grid-major: #2B4166;
+    --ink: #E8EEF7; --ink-2: #A8B6CD;
+    --blue: #56B4E9; --blue-soft: #1B3653; --on-blue: #0F1B2E;
+    --orange: #F0B23A; --orange-ink: #F6C766;
+    --green: #3DC79B; --green-soft: #143A33;
+    --red: #FF8A4C; --red-soft: #3D2419;
+    --purple: #E08CC4; --curve-parent: #7D8CA6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0F1B2E; --sheet: #16243D; --grid: #1B2B45; --grid-major: #2B4166;
+  --ink: #E8EEF7; --ink-2: #A8B6CD;
+  --blue: #56B4E9; --blue-soft: #1B3653; --on-blue: #0F1B2E;
+  --orange: #F0B23A; --orange-ink: #F6C766;
+  --green: #3DC79B; --green-soft: #143A33;
+  --red: #FF8A4C; --red-soft: #3D2419;
+  --purple: #E08CC4; --curve-parent: #7D8CA6;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; color: var(--ink); background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  font: 17px/1.55 var(--font-body);
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; font-weight: 750; letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.1rem; margin-bottom: 8px; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { padding: 0; }
+:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+[data-focus]:focus { outline: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { color: var(--ink-2); }
+.help { color: var(--ink-2); font-size: 1rem; }
+.err { color: var(--red); font-weight: 700; min-height: 0; }
+.err:empty { display: none; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 18px 16px 64px; }
+.stack > * + * { margin-top: 16px; }
+.sheet { background: var(--sheet); border: 1.5px solid var(--grid-major); border-radius: 16px; padding: 18px; }
+@media (min-width: 600px) { .sheet { padding: 24px; } }
+
+/* buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 10px 18px; border-radius: 12px; border: 2px solid var(--ink);
+  background: var(--sheet); color: var(--ink); font-weight: 700; cursor: pointer; text-align: center;
+}
+.btn:hover { background: var(--blue-soft); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: var(--on-blue); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.big { width: 100%; min-height: 56px; font-family: var(--font-display); font-size: 1.2rem; font-weight: 750; border-radius: 14px; }
+.btn.small { min-height: 40px; padding: 6px 12px; font-size: 1rem; border-width: 1.5px; border-radius: 10px; }
+.btn:disabled { opacity: 0.42; cursor: not-allowed; }
+.btn:disabled:hover { background: var(--sheet); }
+.btn.warn, .btn.danger { border-color: var(--red); color: var(--red); }
+.btn .cost { font-weight: 400; color: var(--ink-2); }
+.btn.pu b { display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 4px; border-radius: 999px; background: var(--orange); color: #1d1300; font-size: 0.85rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.actions .btn.big { flex: 1 1 100%; }
+
+/* math */
+.m { font-family: var(--font-math); font-size: 1.12em; white-space: normal; }
+.m i { font-style: italic; padding-right: 0.03em; }
+.m .bo { margin: 0 0.22em; }
+.m sup { font-size: 0.68em; line-height: 0; vertical-align: 0.62em; }
+.rad { display: inline-flex; align-items: flex-start; white-space: nowrap; }
+.rad .rs { line-height: 1; padding-top: 0.06em; }
+.rad .rc { border-top: 0.075em solid currentColor; padding: 0.02em 0.08em 0; margin-top: 0.12em; line-height: 1.15; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.86em; margin: 0 0.12em; line-height: 1.15; }
+.frac .fnum { border-bottom: 0.08em solid currentColor; padding: 0 0.18em 0.04em; }
+.frac .fden { padding: 0.04em 0.18em 0; }
+
+/* top bar */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper); background: color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1.5px solid var(--grid-major); }
+.topbar-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+.me { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
+.avatar { font-size: 1.7rem; line-height: 1; width: 44px; height: 44px; display: grid; place-items: center; background: var(--sheet); border: 1.5px solid var(--grid-major); border-radius: 12px; }
+.avatar.big { width: 72px; height: 72px; font-size: 2.6rem; border-radius: 18px; }
+.me-text { display: flex; flex-direction: column; min-width: 0; }
+.nick { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; color: var(--ink-2); }
+.team-tag::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--tc); }
+.xpbox { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
+.xp-num { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
+.rank { font-size: 0.95rem; color: var(--ink-2); }
+.nav { display: flex; gap: 8px; flex: 1 1 100%; }
+@media (min-width: 620px) { .nav { flex: 0 0 auto; } }
+.runbar { flex-wrap: nowrap; }
+.runbar #quit { white-space: nowrap; flex: 0 0 auto; }
+.rb-mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.rb-level { font-family: var(--font-display); font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rb-prog { color: var(--ink-2); font-size: 0.95rem; }
+.rb-stats { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.25; white-space: nowrap; }
+.rb-xp { font-family: var(--font-display); font-weight: 800; }
+.streak small { color: var(--orange-ink); font-weight: 700; }
+
+/* join */
+.join .hero { margin: 8px 0 22px; }
+.hero h1 { font-size: clamp(2.2rem, 10vw, 4.4rem); font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; font-variation-settings: "opsz" 96; overflow-wrap: anywhere; }
+.hero-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 14px; }
+@media (min-width: 640px) { .hero-row { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: center; gap: 24px; } }
+.lede { font-size: 1.12rem; max-width: 34ch; color: var(--ink-2); }
+.hero-fig { margin: 0; min-width: 0; }
+.hero-graph { aspect-ratio: 16 / 10; }
+.hero-eq { text-align: center; font-size: 1.35rem; margin-top: 8px; min-height: 2em; }
+.lab { display: block; font-weight: 700; margin-bottom: 6px; }
+.fieldblock > * + * { margin-top: 6px; }
+input[type=text], input[type=number], textarea {
+  font: inherit; font-size: 1.05rem; color: var(--ink); background: var(--sheet);
+  border: 2px solid var(--grid-major); border-radius: 10px; padding: 9px 12px; min-height: 46px; max-width: 100%;
+}
+#nick { width: 100%; max-width: 360px; }
+textarea { width: 100%; resize: vertical; line-height: 1.45; }
+input:focus, textarea:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 30%, transparent); }
+.avatars { display: flex; flex-wrap: wrap; gap: 8px; }
+.av { width: 54px; height: 54px; font-size: 1.7rem; border-radius: 12px; border: 2px solid var(--grid-major); background: var(--sheet); cursor: pointer; }
+.av[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); box-shadow: inset 0 0 0 1px var(--blue); }
+.teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 560px) { .teams { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.teambtn { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; border: 2px solid var(--grid-major); border-radius: 12px; background: var(--sheet); font-weight: 700; cursor: pointer; text-align: left; }
+.teambtn[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); }
+.tdot { width: 14px; height: 14px; border-radius: 4px; background: var(--tc); flex: 0 0 auto; }
+.tdot.rnd { background: conic-gradient(var(--t-shift) 0 25%, var(--t-flip) 0 50%, var(--t-stretch) 0 75%, var(--t-squeeze) 0); }
+
+/* graph */
+.graph { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: min(60vh, 440px); background: var(--sheet); border: 1.5px solid var(--grid-major); border-radius: 14px; overflow: hidden; }
+.graph canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 1rem; color: var(--ink-2); align-items: center; }
+.legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { display: inline-block; width: 28px; height: 0; border-top: 3px solid; }
+.sw.dash { border-top: 2px dashed var(--curve-parent); }
+.sw.blue { border-color: var(--blue); }
+.sw.target { border-top-width: 9px; border-color: var(--orange); opacity: 0.55; border-radius: 4px; }
+.dotkey { width: 12px; height: 12px; border-radius: 50%; background: var(--orange); display: inline-block; }
+.qgraph { margin: 0; }
+.qgraph figcaption { margin-top: 8px; }
+
+/* rank card and map */
+.rankcard > * + * { margin-top: 12px; }
+.rankrow { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.rankname { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
+.meter { height: 12px; border-radius: 8px; background: var(--grid); overflow: hidden; }
+.meter > span { display: block; height: 100%; background: var(--orange); border-radius: 8px; }
+.pups { display: flex; flex-wrap: wrap; gap: 8px; }
+.pup { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 12px; border: 1.5px solid var(--grid-major); border-radius: 999px; font-weight: 700; font-size: 0.97rem; background: var(--sheet); }
+.pup b { display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em; border-radius: 999px; background: var(--orange); color: #1d1300; font-size: 0.85rem; }
+.map { position: relative; padding: 10px 0 4px; }
+.trail { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.trail .seg { fill: none; stroke-width: 5; stroke-linecap: round; }
+.trail .seg.on { stroke: var(--blue); }
+.trail .seg.off { stroke: var(--grid-major); stroke-dasharray: 1 11; stroke-width: 5; }
+.lvl {
+  position: relative; display: flex; align-items: center; gap: 14px; width: fit-content; max-width: calc(100% - var(--off) * max(20px, 100% - 420px));
+  margin: 0 0 28px calc(var(--off) * max(20px, 100% - 420px)); padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer;
+}
+.node {
+  flex: 0 0 auto; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+  font: 800 1.6rem/1 var(--font-display); background: var(--sheet); border: 3px solid var(--blue); color: var(--blue);
+  box-shadow: 0 0 0 6px var(--paper);
+}
+.lvl.done .node { background: var(--blue); color: var(--on-blue); }
+.lvl.locked .node { border: 3px dashed var(--grid-major); color: var(--ink-2); }
+.node .lock { width: 22px; height: 22px; }
+.lvl-text { display: flex; flex-direction: column; gap: 2px; background: var(--sheet); border: 1.5px solid var(--grid-major); border-radius: 12px; padding: 10px 14px; max-width: 330px; }
+.lvl:hover .lvl-text, .lvl:focus-visible .lvl-text { border-color: var(--blue); }
+.lvl.locked .lvl-text { border-style: dashed; }
+.lvl.locked:hover .lvl-text { border-color: var(--grid-major); }
+.lvl-name { font: 750 1.12rem/1.2 var(--font-display); }
+.lvl-desc { color: var(--ink-2); font-size: 1rem; line-height: 1.35; }
+.lvl-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 0.97rem; margin-top: 4px; }
+.lockline { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); }
+.stars { color: var(--orange); letter-spacing: 2px; }
+.lvl:last-child { margin-bottom: 0; }
+
+/* question */
+.timerwrap { display: flex; align-items: center; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 66px); z-index: 5; background: var(--paper); padding: 6px 0; }
+.timer { flex: 1 1 auto; height: 12px; border-radius: 8px; background: var(--grid); overflow: hidden; border: 1px solid var(--grid-major); }
+.timer > span { display: block; height: 100%; width: 100%; background: var(--blue); transition: width 0.1s linear; }
+.timer.warn > span { background: var(--orange); }
+.timer.crit > span { background: var(--red); }
+.timer-text { font: 800 1.05rem var(--font-display); min-width: 3.4em; text-align: right; font-variant-numeric: tabular-nums; }
+.prompt { font-family: var(--font-body); font-weight: 700; font-size: 1.22rem; line-height: 1.45; letter-spacing: 0; }
+.prompt:focus { outline: none; }
+.choices { display: grid; gap: 10px; }
+.choices.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.choice {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; padding: 12px 14px; min-height: 54px;
+  border: 2px solid var(--grid-major); border-radius: 12px; background: var(--sheet); cursor: pointer; font-size: 1.04rem; line-height: 1.4;
+}
+.choice:hover { border-color: var(--blue); }
+.choice[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); box-shadow: inset 0 0 0 1px var(--blue); }
+.choice.gone { opacity: 0.3; text-decoration: line-through; cursor: not-allowed; }
+.choice.stmt { flex-direction: row; align-items: flex-start; gap: 12px; }
+.stn { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--grid); font-weight: 700; font-size: 0.95rem; }
+.cname { font-size: 0.95rem; color: var(--ink-2); }
+.plab { font-weight: 700; }
+.field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.flabel { font-weight: 700; }
+.pt { display: inline-flex; align-items: center; gap: 4px; font-size: 1.4rem; font-family: var(--font-math); }
+.num { width: 6em; text-align: center; }
+.pre .m { font-size: 1.2em; }
+.eq-in { flex: 1 1 220px; }
+.eqblock > * + * { margin-top: 8px; }
+.keypad { display: flex; flex-wrap: wrap; gap: 6px; }
+.keypad button { min-width: 48px; min-height: 42px; border: 1.5px solid var(--grid-major); border-radius: 10px; background: var(--sheet); font-weight: 700; cursor: pointer; }
+.keypad button:hover { border-color: var(--blue); }
+.preview { min-height: 1.6em; padding: 4px 0 4px 12px; border-left: 3px solid var(--blue); }
+.preview:empty { display: none; }
+.preview.bad { border-left-color: var(--grid-major); color: var(--ink-2); }
+.seg { display: inline-flex; border: 2px solid var(--grid-major); border-radius: 12px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; background: var(--sheet); padding: 8px 16px; min-height: 44px; cursor: pointer; font-weight: 700; }
+.seg button + button { border-left: 2px solid var(--grid-major); }
+.seg button[aria-pressed="true"] { background: var(--blue); color: var(--on-blue); }
+.orderblock > * + * { margin-top: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 2px solid var(--grid-major); background: var(--sheet); border-radius: 999px; padding: 7px 14px; min-height: 44px; cursor: pointer; font-weight: 700; font-size: 1rem; }
+.chip:hover:not(:disabled) { border-color: var(--blue); }
+.chip:disabled { opacity: 0.3; cursor: default; }
+.seq { list-style: none; margin: 0; padding: 12px; border: 2px dashed var(--grid-major); border-radius: 12px; min-height: 64px; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: s; align-items: center; }
+.seq li { counter-increment: s; }
+.seq li.empty { counter-increment: none; color: var(--ink-2); }
+.seq .chip.on { border-color: var(--blue); background: var(--blue-soft); }
+.seq .chip.on::before { content: counter(s) ". "; color: var(--blue); }
+.hintbox { padding: 12px 14px; border-radius: 12px; background: var(--blue-soft); border-left: 4px solid var(--blue); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.tools-note { text-align: center; }
+
+/* boss */
+.boss { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center; }
+.monster { width: 112px; height: auto; overflow: visible; display: block; }
+.monster .mon-body { transform-box: view-box; transform-origin: 110px 158px; transition: transform 0.9s cubic-bezier(.55, 0, .7, .2); }
+.monster.down .mon-body, .monster.defeated .mon-body { transform: scaleY(0.07); }
+.monster.hit { animation: shake 0.5s; }
+.monster.taunt .pupil { animation: look 0.9s ease-in-out; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@keyframes look { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.boss-name { font: 800 1.15rem var(--font-display); }
+.hp { height: 16px; border-radius: 9px; background: var(--grid); overflow: hidden; border: 2px solid var(--ink); margin: 6px 0; }
+.hp > span { display: block; height: 100%; background: var(--red); transition: width 0.7s ease; }
+.hearts { font-size: 1.5rem; color: var(--red); letter-spacing: 3px; line-height: 1.1; }
+.hearts .lost { color: var(--grid-major); }
+.hearts .pop { display: inline-block; animation: pop 0.6s; }
+@keyframes pop { 0% { transform: scale(1.6); color: var(--red); } 100% { transform: scale(1); } }
+.boss-msg { margin-top: 6px; font-weight: 700; }
+.done-card .monster { width: 150px; margin: 0 auto; }
+
+/* feedback */
+.verdict { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 12px 16px; border-radius: 14px; font: 800 1.45rem/1.2 var(--font-display); }
+.verdict:focus { outline: none; }
+.verdict.ok { background: var(--green-soft); color: var(--green); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.neutral { background: var(--blue-soft); color: var(--blue); }
+.vicon { font-size: 1.5rem; }
+.xpgain { margin-left: auto; color: var(--orange-ink); font-size: 1.3rem; }
+.bd { color: var(--ink-2); font-size: 1rem; word-spacing: 2px; }
+.ans { display: grid; gap: 2px; }
+.anslab { font-weight: 700; font-size: 0.97rem; color: var(--ink-2); }
+.anim { margin: 0; }
+.steps { margin: 0; padding-left: 1.4em; }
+.steps li { color: var(--ink-2); padding: 2px 0; }
+.steps li.active { color: var(--blue); font-weight: 700; }
+.steps li.done { color: var(--ink); }
+.bigstars { font-size: 2rem; color: var(--orange); letter-spacing: 6px; }
+
+/* graph builder */
+.gb-eq { font-size: 1.15rem; }
+.gbstick { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); z-index: 4; background: var(--sheet); padding: 6px 0 8px; border-bottom: 1.5px solid var(--grid-major); }
+.gbstick > * + * { margin-top: 8px; }
+@media (max-width: 640px) { .gbgraph { aspect-ratio: auto; height: min(34vh, 260px); } .gbstick .legend { font-size: 0.9rem; } }
+.ctls { display: grid; gap: 14px; }
+@media (min-width: 640px) { .ctls { grid-template-columns: 1fr 1fr; } }
+.ctl { border: 1.5px solid var(--grid-major); border-radius: 12px; padding: 10px 12px; }
+.ctl-top { display: flex; gap: 10px; align-items: baseline; }
+.ctl-name { font-size: 1.4rem; min-width: 1em; }
+.ctl-help { color: var(--ink-2); font-size: 0.95rem; line-height: 1.3; }
+.ctl-in { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+.ctl-in input[type=range] { flex: 1 1 auto; accent-color: var(--blue); min-height: 36px; }
+.numbox { width: 5.2em; text-align: center; }
+
+/* stats, badges, tables */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 0; }
+.stats > div { border: 1.5px solid var(--grid-major); border-radius: 12px; padding: 10px 12px; }
+.stats dt { color: var(--ink-2); font-size: 0.95rem; }
+.stats dd { margin: 0; font: 800 1.35rem/1.25 var(--font-display); }
+.stats small { font: 400 0.95rem var(--font-body); color: var(--ink-2); }
+.newbest { color: var(--green) !important; font-weight: 700 !important; }
+.badgechips { display: flex; flex-wrap: wrap; gap: 8px; }
+.bchip { padding: 6px 12px; border-radius: 999px; background: var(--blue-soft); font-weight: 700; }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.badge { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--grid-major); border-radius: 12px; padding: 10px 12px; }
+.badge.got { border-color: var(--orange); }
+.badge.locked { opacity: 0.55; border-style: dashed; }
+.bi { font-size: 1.7rem; line-height: 1.1; }
+.bn { font-weight: 700; }
+.bd2 { color: var(--ink-2); font-size: 0.95rem; line-height: 1.35; }
+.scorecard { display: flex; align-items: center; gap: 14px; }
+.sc-nick { font: 800 1.6rem/1.15 var(--font-display); }
+.ranks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.ranks li { display: flex; justify-content: space-between; padding: 6px 10px; border-radius: 8px; color: var(--ink-2); }
+.ranks li.got { color: var(--ink); }
+.ranks li.cur { background: var(--blue-soft); font-weight: 700; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 440px; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--grid-major); }
+thead th { color: var(--ink-2); font-size: 0.95rem; }
+tbody th { font-weight: 700; }
+.pulist { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pulist li { display: grid; gap: 4px; }
+.check { display: flex; gap: 10px; align-items: center; font-weight: 700; cursor: pointer; }
+.check input { width: 22px; height: 22px; accent-color: var(--blue); }
+#res { font-size: 1rem; }
+
+/* overlay and toasts */
+.overlay { position: fixed; inset: 0; z-index: 40; background: rgba(10, 18, 34, 0.55); display: grid; place-items: center; padding: 16px; }
+.overlay .sheet { width: min(560px, 100%); }
+#toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 50; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+.toast { background: var(--ink); color: var(--paper); border-radius: 12px; padding: 10px 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(10, 18, 34, 0.25); animation: toastIn 0.25s ease-out; transition: opacity 0.3s, transform 0.3s; }
+.toast.out { opacity: 0; transform: translateY(8px); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts" aria-live="polite"></div>
+<script type="application/json" id="question-bank">
+{
+ "levels": [
+  {
+   "id": "0",
+   "num": 0,
+   "name": "Parent Function Match",
+   "blurb": "Match each graph to its parent function.",
+   "time": 20,
+   "points": 50,
+   "items": [
+    "Q0.1",
+    "Q0.2",
+    "Q0.3",
+    "Q0.4",
+    "Q0.5",
+    "Q0.6"
+   ]
+  },
+  {
+   "id": "1",
+   "num": 1,
+   "name": "Spot the Glitch",
+   "blurb": "Each worked example hides one error. Find it, then fix it.",
+   "time": 45,
+   "points": 100,
+   "items": [
+    "Q1.1",
+    "Q1.2",
+    "Q1.3"
+   ]
+  },
+  {
+   "id": "2",
+   "num": 2,
+   "name": "Shift Shooter",
+   "blurb": "Rapid-fire vertical and horizontal shifts. Build a streak.",
+   "time": 30,
+   "points": 100,
+   "items": [
+    "Q2.1",
+    "Q2.2",
+    "Q2.3",
+    "Q2.4",
+    "Q2.5",
+    "Q2.6",
+    "Q2.7",
+    "Q2.8",
+    "Q2.9",
+    "Q2.10"
+   ]
+  },
+  {
+   "id": "3",
+   "num": 3,
+   "name": "Mirror and Stretch Lab",
+   "blurb": "Reflections, stretches and compressions, plus Graph Builder rounds.",
+   "time": 45,
+   "points": 100,
+   "items": [
+    "Q3.1",
+    "GB1",
+    "Q3.2",
+    "GB3",
+    "Q3.3",
+    "Q3.4",
+    "Q3.5",
+    "GB2",
+    "Q3.6",
+    "Q3.7",
+    "GB4",
+    "Q3.8",
+    "Q3.9",
+    "Q3.10",
+    "GB5"
+   ]
+  },
+  {
+   "id": "4",
+   "num": 4,
+   "name": "Boss Battle: Modeling Mode",
+   "blurb": "Real-world transformations. Every correct answer damages the Model Monster.",
+   "time": 60,
+   "points": 100,
+   "boss": true,
+   "reason": true,
+   "items": [
+    "Q4.1",
+    "Q4.2",
+    "Q4.3",
+    "Q4.4",
+    "Q4.5",
+    "Q4.6",
+    "Q4.7",
+    "Q4.8"
+   ]
+  },
+  {
+   "id": "F",
+   "num": null,
+   "name": "Final Checkpoint",
+   "blurb": "Three questions on your own. No timer, no hints, no power-ups.",
+   "time": 0,
+   "points": 100,
+   "final": true,
+   "items": [
+    "FC1",
+    "FC2",
+    "FC3"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "Q0.1",
+   "level": "0",
+   "type": "matching",
+   "prompt": "Which parent function makes this graph?",
+   "graph": {
+    "parent": "square",
+    "points": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      -1,
+      1
+     ]
+    ]
+   },
+   "graphDesc": "A U-shaped graph with its lowest point at $(0, 0)$ that passes through $(1, 1)$ and $(-1, 1)$.",
+   "parts": [
+    {
+     "kind": "parent",
+     "answer": "square"
+    }
+   ],
+   "answerText": "$f(x) = x^2$",
+   "explanation": "$y = x^2$ makes a U shape called a parabola, with its vertex at the origin. Both $1^2$ and $(-1)^2$ equal 1.",
+   "hint": "Try squaring a few inputs. What do $1$ and $-1$ give?",
+   "tag": "parent-function"
+  },
+  {
+   "id": "Q0.2",
+   "level": "0",
+   "type": "matching",
+   "prompt": "Which parent function makes this graph?",
+   "graph": {
+    "parent": "abs",
+    "points": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      -2,
+      2
+     ]
+    ]
+   },
+   "graphDesc": "A V-shaped graph with its vertex at $(0, 0)$ that passes through $(2, 2)$ and $(-2, 2)$.",
+   "parts": [
+    {
+     "kind": "parent",
+     "answer": "abs"
+    }
+   ],
+   "answerText": "$f(x) = |x|$",
+   "explanation": "$y = |x|$ makes a V with a sharp corner at the origin. Both $2$ and $-2$ have absolute value 2.",
+   "hint": "Which function turns every negative input into a positive output?",
+   "tag": "parent-function"
+  },
+  {
+   "id": "Q0.3",
+   "level": "0",
+   "type": "matching",
+   "prompt": "Which parent function makes this graph?",
+   "graph": {
+    "parent": "sqrt",
+    "points": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      4,
+      2
+     ]
+    ]
+   },
+   "graphDesc": "A graph that starts at $(0, 0)$ and passes through $(1, 1)$ and $(4, 2)$, curving to the right.",
+   "parts": [
+    {
+     "kind": "parent",
+     "answer": "sqrt"
+    }
+   ],
+   "answerText": "$f(x) = sqrt(x)$",
+   "explanation": "$y = sqrt(x)$ starts at the origin and only exists for $x >= 0$. Since $sqrt(4) = 2$, it passes through $(4, 2)$.",
+   "hint": "Which function has no outputs for negative inputs?",
+   "tag": "parent-function"
+  },
+  {
+   "id": "Q0.4",
+   "level": "0",
+   "type": "matching",
+   "prompt": "Which parent function makes this graph?",
+   "graph": {
+    "parent": "cube",
+    "points": [
+     [
+      -1,
+      -1
+     ],
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      8
+     ]
+    ],
+    "view": {
+     "xmin": -4,
+     "xmax": 4,
+     "ymin": -2.5,
+     "ymax": 9
+    }
+   },
+   "graphDesc": "An S-shaped graph through $(-1, -1)$, $(0, 0)$, $(1, 1)$, and $(2, 8)$.",
+   "parts": [
+    {
+     "kind": "parent",
+     "answer": "cube"
+    }
+   ],
+   "answerText": "$f(x) = x^3$",
+   "explanation": "$y = x^3$ is S-shaped and passes through $(2, 8)$ because $2^3 = 8$.",
+   "hint": "What do you do to 2 to get 8?",
+   "tag": "parent-function"
+  },
+  {
+   "id": "Q0.5",
+   "level": "0",
+   "type": "matching",
+   "prompt": "Which parent function makes this graph?",
+   "graph": {
+    "parent": "recip",
+    "points": []
+   },
+   "graphDesc": "A graph with two separate branches and asymptotes $x = 0$ and $y = 0$.",
+   "parts": [
+    {
+     "kind": "parent",
+     "answer": "recip"
+    }
+   ],
+   "answerText": "$f(x) = {1/x}$",
+   "explanation": "$y = {1/x}$ has two branches and never touches either axis, so $x = 0$ and $y = 0$ are its asymptotes.",
+   "hint": "Which function is undefined at $x = 0$?",
+   "tag": "parent-function"
+  },
+  {
+   "id": "Q0.6",
+   "level": "0",
+   "type": "matching",
+   "prompt": "Which parent function makes this graph?",
+   "graph": {
+    "parent": "linear",
+    "points": [
+     [
+      0,
+      0
+     ]
+    ]
+   },
+   "graphDesc": "A straight line through $(0, 0)$ with slope 1.",
+   "parts": [
+    {
+     "kind": "parent",
+     "answer": "linear"
+    }
+   ],
+   "answerText": "$f(x) = x$",
+   "explanation": "$y = x$ gives back every input unchanged, so it is a straight line through the origin with slope 1.",
+   "hint": "On this graph, every point has matching x- and y-coordinates.",
+   "tag": "parent-function"
+  },
+  {
+   "id": "Q1.1",
+   "level": "1",
+   "type": "errorHunt",
+   "prompt": "One statement about $g(x) = (x + 4)^2$ has a glitch.",
+   "parts": [
+    {
+     "kind": "glitch",
+     "steps": [
+      "The parent function is $y = x^2$, a parabola with vertex $(0, 0)$.",
+      "The $+4$ is inside the function with $x$, so the change is horizontal.",
+      "$g(x) = (x + 4)^2$ shifts the graph of $y = x^2$ right 4 units."
+     ],
+     "glitch": 2,
+     "fixes": [
+      "It shifts the graph left 4 units.",
+      "It shifts the graph up 4 units.",
+      "It shifts the graph down 4 units."
+     ],
+     "fix": 0
+    }
+   ],
+   "answerText": "Error: the shift is left 4 units, not right.",
+   "explanation": "The new graph reaches each output 4 units sooner, so every point moves left 4. The vertex moves from $(0, 0)$ to $(-4, 0)$.",
+   "hint": "Which input makes $x + 4 = 0$? That is where the vertex lands.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "square",
+    "h": -4
+   }
+  },
+  {
+   "id": "Q1.2",
+   "level": "1",
+   "type": "errorHunt",
+   "prompt": "One statement about $g(x) = -|x|$ has a glitch.",
+   "parts": [
+    {
+     "kind": "glitch",
+     "steps": [
+      "$g(x) = -|x|$ reflects the graph of $y = |x|$ across the y-axis.",
+      "The vertex of $g$ stays at $(0, 0)$.",
+      "The graph of $g$ opens downward."
+     ],
+     "glitch": 0,
+     "fixes": [
+      "It reflects the graph across the x-axis.",
+      "It shifts the graph down 1 unit.",
+      "It reflects the graph across the line $y = x$."
+     ],
+     "fix": 0
+    }
+   ],
+   "answerText": "Error: $-f(x)$ reflects across the x-axis. (Reflecting $|x|$ across the y-axis would not change it.)",
+   "explanation": "The negative sign is outside the absolute value, so it flips every output. Points above the x-axis land below it, and the V opens downward.",
+   "hint": "Is the negative sign inside the absolute value with $x$, or outside it?",
+   "tag": "reflection-axis",
+   "fx": {
+    "parent": "abs",
+    "a": -1
+   }
+  },
+  {
+   "id": "Q1.3",
+   "level": "1",
+   "type": "errorHunt",
+   "prompt": "One statement about $g(x) = sqrt(3x)$ has a glitch.",
+   "parts": [
+    {
+     "kind": "glitch",
+     "steps": [
+      "The 3 multiplies $x$ inside the square root, so the change is horizontal.",
+      "$g(x) = sqrt(3x)$ is a horizontal stretch of $y = sqrt(x)$ by a factor of 3.",
+      "The graph of $g$ still starts at $(0, 0)$."
+     ],
+     "glitch": 1,
+     "fixes": [
+      "It is a horizontal compression by a factor of $1/3$.",
+      "It is a vertical stretch by a factor of 3.",
+      "It is a horizontal shift right 3 units."
+     ],
+     "fix": 0
+    }
+   ],
+   "answerText": "Error: it is a horizontal compression by a factor of $1/3$.",
+   "explanation": "Multiplying $x$ by 3 inside means each output is reached 3 times sooner, so the graph squeezes toward the y-axis. The point $(9, 3)$ moves to $(3, 3)$.",
+   "hint": "Test a point. $(9, 3)$ is on $y = sqrt(x)$. What input makes $sqrt(3x) = 3$?",
+   "tag": "horizontal-stretch-compress",
+   "fx": {
+    "parent": "sqrt",
+    "b": 3,
+    "pt": [
+     9,
+     3
+    ],
+    "view": {
+     "xmin": -2,
+     "xmax": 11,
+     "ymin": -2,
+     "ymax": 6
+    }
+   }
+  },
+  {
+   "id": "Q2.1",
+   "level": "2",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = x^2$ to $g(x) = x^2 + 5$.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Shift up 5 units",
+      "Shift down 5 units",
+      "Shift right 5 units",
+      "Shift left 5 units"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Shift up 5 units.",
+   "explanation": "Adding 5 outside the function adds 5 to every output, so every point moves up 5.",
+   "hint": "The $+5$ is outside the function. Outside changes the y-values.",
+   "tag": "vertical-shift",
+   "fx": {
+    "parent": "square",
+    "k": 5,
+    "view": {
+     "xmin": -6,
+     "xmax": 6,
+     "ymin": -2,
+     "ymax": 10
+    }
+   }
+  },
+  {
+   "id": "Q2.2",
+   "level": "2",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = |x|$ to $g(x) = |x - 3|$.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Shift right 3 units",
+      "Shift left 3 units",
+      "Shift up 3 units",
+      "Shift down 3 units"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Shift right 3 units.",
+   "explanation": "Inside the function, $x - 3$ moves the graph right 3. The vertex moves from $(0, 0)$ to $(3, 0)$.",
+   "hint": "Which input makes $x - 3 = 0$?",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "abs",
+    "h": 3
+   }
+  },
+  {
+   "id": "Q2.3",
+   "level": "2",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = sqrt(x)$ to $g(x) = sqrt(x + 2) - 1$.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Shift left 2 units and down 1 unit",
+      "Shift right 2 units and down 1 unit",
+      "Shift left 2 units and up 1 unit",
+      "Shift right 2 units and up 1 unit"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Shift left 2 units and down 1 unit.",
+   "explanation": "Inside, $x + 2$ shifts left 2. Outside, $-1$ shifts down 1. The starting point moves from $(0, 0)$ to $(-2, -1)$.",
+   "hint": "Handle the inside (horizontal) and the outside (vertical) separately.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "sqrt",
+    "h": -2,
+    "k": -1
+   }
+  },
+  {
+   "id": "Q2.4",
+   "level": "2",
+   "type": "coordinateEntry",
+   "prompt": "Find the vertex of $g(x) = (x - 4)^2 + 3$.",
+   "parts": [
+    {
+     "kind": "point",
+     "label": "Vertex",
+     "x": "4",
+     "y": "3"
+    }
+   ],
+   "answerText": "$(4, 3)$",
+   "explanation": "$(x - 4)^2 + 3$ is $x^2$ shifted right 4 and up 3, so the vertex moves from $(0, 0)$ to $(4, 3)$.",
+   "hint": "The vertex of $(x - h)^2 + k$ is $(h, k)$. Watch the sign of $h$.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "square",
+    "h": 4,
+    "k": 3,
+    "view": {
+     "xmin": -4,
+     "xmax": 9,
+     "ymin": -2,
+     "ymax": 9
+    }
+   }
+  },
+  {
+   "id": "Q2.5",
+   "level": "2",
+   "type": "coordinateEntry",
+   "prompt": "Find the vertex of $g(x) = |x + 6| - 2$.",
+   "parts": [
+    {
+     "kind": "point",
+     "label": "Vertex",
+     "x": "-6",
+     "y": "-2"
+    }
+   ],
+   "answerText": "$(-6, -2)$",
+   "explanation": "$x + 6 = 0$ when $x = -6$, and the $-2$ shifts down 2, so the vertex is $(-6, -2)$.",
+   "hint": "Set the inside of the absolute value equal to 0 to find the x-coordinate.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "abs",
+    "h": -6,
+    "k": -2,
+    "view": {
+     "xmin": -10,
+     "xmax": 4,
+     "ymin": -4,
+     "ymax": 6
+    }
+   }
+  },
+  {
+   "id": "Q2.6",
+   "level": "2",
+   "type": "typedEquation",
+   "prompt": "Write the equation of $f(x) = |x|$ shifted left 1 unit and up 6 units.",
+   "parts": [
+    {
+     "kind": "eq",
+     "label": "$g(x) =$",
+     "answer": "|x+1|+6"
+    }
+   ],
+   "answerText": "$g(x) = |x + 1| + 6$",
+   "explanation": "Left 1 means replacing $x$ with $x + 1$ inside. Up 6 means adding 6 outside.",
+   "hint": "Left means adding inside the function.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "abs",
+    "h": -1,
+    "k": 6,
+    "view": {
+     "xmin": -7,
+     "xmax": 6,
+     "ymin": -2,
+     "ymax": 11
+    }
+   }
+  },
+  {
+   "id": "Q2.7",
+   "level": "2",
+   "type": "typedEquation",
+   "prompt": "Write the equation of $f(x) = x^3$ shifted right 2 units and down 5 units.",
+   "parts": [
+    {
+     "kind": "eq",
+     "label": "$g(x) =$",
+     "answer": "(x-2)^3-5"
+    }
+   ],
+   "answerText": "$g(x) = (x - 2)^3 - 5$",
+   "explanation": "Right 2 means replacing $x$ with $x - 2$ inside. Down 5 means subtracting 5 outside.",
+   "hint": "Right means subtracting inside: $(x - 2)$.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "cube",
+    "h": 2,
+    "k": -5,
+    "view": {
+     "xmin": -5,
+     "xmax": 7,
+     "ymin": -11,
+     "ymax": 5
+    }
+   }
+  },
+  {
+   "id": "Q2.8",
+   "level": "2",
+   "type": "coordinateEntry",
+   "prompt": "The point $(2, 4)$ is on the graph of $f$. Where does it move on $g(x) = f(x - 5) + 2$?",
+   "parts": [
+    {
+     "kind": "point",
+     "label": "New point",
+     "x": "7",
+     "y": "6"
+    }
+   ],
+   "answerText": "$(7, 6)$",
+   "explanation": "$f(x - 5)$ moves every point right 5, and $+2$ moves it up 2: $(2 + 5, 4 + 2) = (7, 6)$.",
+   "hint": "Add the horizontal shift to the x-coordinate and the vertical shift to the y-coordinate.",
+   "tag": "point-mapping",
+   "fx": {
+    "parent": "square",
+    "h": 5,
+    "k": 2,
+    "pt": [
+     2,
+     4
+    ],
+    "note": "Shown with $f(x) = x^2$ as an example, since $(2, 4)$ is on it.",
+    "view": {
+     "xmin": -3,
+     "xmax": 10,
+     "ymin": -1,
+     "ymax": 9
+    }
+   }
+  },
+  {
+   "id": "Q2.9",
+   "level": "2",
+   "type": "shortAnswer",
+   "prompt": "State the asymptotes of $g(x) = {1/x - 3} + 1$.",
+   "parts": [
+    {
+     "kind": "num",
+     "label": "Vertical asymptote",
+     "prefix": "$x =$",
+     "answer": "3"
+    },
+    {
+     "kind": "num",
+     "label": "Horizontal asymptote",
+     "prefix": "$y =$",
+     "answer": "1"
+    }
+   ],
+   "answerText": "Vertical asymptote $x = 3$; horizontal asymptote $y = 1$.",
+   "explanation": "The parent $y = {1/x}$ has asymptotes $x = 0$ and $y = 0$. Shifting right 3 and up 1 moves them to $x = 3$ and $y = 1$.",
+   "hint": "Find the two shifts, then move both asymptotes of $y = {1/x}$.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "recip",
+    "h": 3,
+    "k": 1,
+    "view": {
+     "xmin": -4,
+     "xmax": 9,
+     "ymin": -5,
+     "ymax": 6
+    }
+   }
+  },
+  {
+   "id": "Q2.10",
+   "level": "2",
+   "type": "multipleChoice",
+   "prompt": "Which equation moves the graph of $f$ horizontally: $f(x) + 3$ or $f(x + 3)$?",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "$f(x + 3)$, which shifts left 3 units",
+      "$f(x + 3)$, which shifts right 3 units",
+      "$f(x) + 3$, which shifts left 3 units",
+      "$f(x) + 3$, which shifts right 3 units"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "$f(x + 3)$, which shifts left 3 units.",
+   "explanation": "A change inside the parentheses affects $x$, so $f(x + 3)$ moves the graph horizontally, 3 units left. $f(x) + 3$ moves it up 3.",
+   "hint": "Inside the function affects x. Outside affects y.",
+   "tag": "inside-vs-outside"
+  },
+  {
+   "id": "Q3.1",
+   "level": "3",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = x^2$ to $g(x) = -x^2$.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Reflection across the x-axis",
+      "Reflection across the y-axis",
+      "Shift down 1 unit",
+      "No change: the graph stays the same"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Reflection across the x-axis.",
+   "explanation": "In $-x^2$ the squaring happens first, then the negative flips every output. The parabola flips across the x-axis and opens downward.",
+   "hint": "Is the negative applied before or after squaring?",
+   "tag": "reflection-axis",
+   "fx": {
+    "parent": "square",
+    "a": -1
+   }
+  },
+  {
+   "id": "GB1",
+   "level": "3",
+   "type": "graphMatch",
+   "parent": "square",
+   "prompt": "Parent $f(x) = x^2$. Target: a parabola with vertex $(0, 0)$ that opens downward.",
+   "target": {
+    "a": -1,
+    "b": 1,
+    "h": 0,
+    "k": 0
+   },
+   "min": 1,
+   "answerText": "$a = -1$, $b = 1$, $h = 0$, $k = 0$, so $g(x) = -x^2$. Minimum moves: 1.",
+   "explanation": "A negative $a$ flips every output across the x-axis.",
+   "tag": "graph-builder"
+  },
+  {
+   "id": "Q3.2",
+   "level": "3",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = sqrt(x)$ to $g(x) = sqrt(-x)$, and give the new domain.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Reflection across the y-axis; domain $x <= 0$",
+      "Reflection across the x-axis; domain $x <= 0$",
+      "Reflection across the y-axis; domain $x >= 0$",
+      "Reflection across the x-axis; domain $x >= 0$"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Reflection across the y-axis; domain $x <= 0$.",
+   "explanation": "$sqrt(-x)$ negates the input, which reflects the graph across the y-axis. The square root needs $-x >= 0$, so the domain is $x <= 0$.",
+   "hint": "A negative inside affects x. Then ask which inputs keep $-x$ from being negative.",
+   "tag": "reflection-axis",
+   "fx": {
+    "parent": "sqrt",
+    "b": -1
+   }
+  },
+  {
+   "id": "GB3",
+   "level": "3",
+   "type": "graphMatch",
+   "parent": "sqrt",
+   "prompt": "Parent $f(x) = sqrt(x)$. Target: a square root curve that starts at $(0, 2)$ and heads to the left.",
+   "target": {
+    "a": 1,
+    "b": -1,
+    "h": 0,
+    "k": 2
+   },
+   "min": 2,
+   "answerText": "$a = 1$, $b = -1$, $h = 0$, $k = 2$, so $g(x) = sqrt(-x) + 2$. Minimum moves: 2.",
+   "explanation": "$b = -1$ reflects across the y-axis so the curve heads left, and $k = 2$ lifts the starting point to $(0, 2)$.",
+   "tag": "graph-builder"
+  },
+  {
+   "id": "Q3.3",
+   "level": "3",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = |x|$ to $g(x) = 3|x|$.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Vertical stretch by a factor of 3",
+      "Vertical compression by a factor of $1/3$",
+      "Horizontal stretch by a factor of 3",
+      "Shift up 3 units"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Vertical stretch by a factor of 3.",
+   "explanation": "Multiplying outside by 3 triples every output, so $(1, 1)$ moves to $(1, 3)$ and the V gets steeper.",
+   "hint": "Multiplying outside the function changes the y-values.",
+   "tag": "vertical-stretch-compress",
+   "fx": {
+    "parent": "abs",
+    "a": 3,
+    "pt": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "Q3.4",
+   "level": "3",
+   "type": "multipleChoice",
+   "prompt": "Describe the transformation from $f(x) = x^2$ to $g(x) = {1/2}x^2$.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Vertical compression by a factor of $1/2$",
+      "Vertical stretch by a factor of 2",
+      "Horizontal compression by a factor of $1/2$",
+      "Shift down $1/2$ unit"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Vertical compression by a factor of $1/2$.",
+   "explanation": "Multiplying outside by $1/2$ halves every output, so $(2, 4)$ moves to $(2, 2)$ and the parabola gets wider.",
+   "hint": "Is the outside factor bigger or smaller than 1?",
+   "tag": "vertical-stretch-compress",
+   "fx": {
+    "parent": "square",
+    "a": 0.5,
+    "pt": [
+     2,
+     4
+    ]
+   }
+  },
+  {
+   "id": "Q3.5",
+   "level": "3",
+   "type": "shortAnswer",
+   "prompt": "Challenge: describe $g(x) = sqrt(4x)$ as a transformation of $f(x) = sqrt(x)$ in two different ways.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Horizontal compression by a factor of $1/4$, or a vertical stretch by a factor of 2",
+      "Horizontal stretch by a factor of 4, or a vertical stretch by a factor of 4",
+      "Horizontal compression by a factor of $1/4$, or a vertical stretch by a factor of 4",
+      "Horizontal stretch by a factor of 4, or a vertical compression by a factor of $1/2$"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Horizontal compression by a factor of $1/4$, or equivalently a vertical stretch by a factor of 2, since $sqrt(4x) = 2sqrt(x)$.",
+   "explanation": "Inside, $4x$ squeezes the graph toward the y-axis by a factor of $1/4$. Splitting the root gives $sqrt(4x) = sqrt(4) * sqrt(x) = 2sqrt(x)$, a vertical stretch by 2. Both describe the same graph.",
+   "hint": "Split the square root: $sqrt(4x) = sqrt(4) * sqrt(x)$.",
+   "tag": "horizontal-stretch-compress",
+   "fx": {
+    "parent": "sqrt",
+    "b": 4,
+    "pt": [
+     4,
+     2
+    ],
+    "view": {
+     "xmin": -2,
+     "xmax": 8,
+     "ymin": -2,
+     "ymax": 6
+    }
+   }
+  },
+  {
+   "id": "GB2",
+   "level": "3",
+   "type": "graphMatch",
+   "parent": "abs",
+   "prompt": "Parent $f(x) = |x|$. Target: a V with vertex $(-3, 0)$ that opens upward and is twice as steep.",
+   "target": {
+    "a": 2,
+    "b": 1,
+    "h": -3,
+    "k": 0
+   },
+   "min": 2,
+   "answerText": "$a = 2$, $b = 1$, $h = -3$, $k = 0$, so $g(x) = 2|x + 3|$. Minimum moves: 2.",
+   "explanation": "$a = 2$ doubles every output so the V is steeper, and $h = -3$ moves the vertex left 3.",
+   "tag": "graph-builder"
+  },
+  {
+   "id": "Q3.6",
+   "level": "3",
+   "type": "coordinateEntry",
+   "prompt": "The point $(2, 4)$ is on $f(x) = x^2$. Where does it move on $g(x) = f(2x)$?",
+   "parts": [
+    {
+     "kind": "point",
+     "label": "New point",
+     "x": "1",
+     "y": "4"
+    }
+   ],
+   "answerText": "$(1, 4)$",
+   "explanation": "$f(2x)$ is a horizontal compression by a factor of $1/2$, so divide the x-coordinate by 2: $(2, 4)$ moves to $(1, 4)$. Check: $g(1) = (2 * 1)^2 = 4$.",
+   "hint": "Multiplying inside works the opposite way on x: divide by 2.",
+   "tag": "point-mapping",
+   "fx": {
+    "parent": "square",
+    "b": 2,
+    "pt": [
+     2,
+     4
+    ]
+   }
+  },
+  {
+   "id": "Q3.7",
+   "level": "3",
+   "type": "coordinateEntry",
+   "prompt": "The point $(3, -2)$ is on the graph of $f$. Where does it move on $g(x) = -2f(x)$?",
+   "parts": [
+    {
+     "kind": "point",
+     "label": "New point",
+     "x": "3",
+     "y": "4"
+    }
+   ],
+   "answerText": "$(3, 4)$",
+   "explanation": "$-2f(x)$ multiplies every y-coordinate by $-2$ and leaves x alone: $(3, (-2)(-2)) = (3, 4)$.",
+   "hint": "Outside the function, only the y-coordinate changes.",
+   "tag": "point-mapping"
+  },
+  {
+   "id": "GB4",
+   "level": "3",
+   "type": "graphMatch",
+   "parent": "square",
+   "prompt": "Parent $f(x) = x^2$. Target: a parabola with vertex $(2, -4)$ that opens upward and is wider than $y = x^2$.",
+   "target": {
+    "a": 0.5,
+    "b": 1,
+    "h": 2,
+    "k": -4
+   },
+   "min": 3,
+   "answerText": "$a = 0.5$, $b = 1$, $h = 2$, $k = -4$, so $g(x) = 0.5(x - 2)^2 - 4$. Minimum moves: 3.",
+   "explanation": "$a = 0.5$ halves every output so the parabola is wider, $h = 2$ shifts right 2, and $k = -4$ shifts down 4.",
+   "tag": "graph-builder"
+  },
+  {
+   "id": "Q3.8",
+   "level": "3",
+   "type": "multipleChoice",
+   "prompt": "Describe all transformations from $f(x) = x^2$ to $g(x) = -2(x - 1)^2 + 4$ and give the vertex.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "Shift right 1, vertical stretch by 2, reflection across the x-axis, shift up 4; vertex $(1, 4)$, opens downward",
+      "Shift left 1, vertical stretch by 2, reflection across the x-axis, shift up 4; vertex $(-1, 4)$, opens downward",
+      "Shift right 1, vertical compression by $1/2$, reflection across the y-axis, shift up 4; vertex $(1, 4)$, opens upward",
+      "Shift right 1, vertical stretch by 2, reflection across the x-axis, shift down 4; vertex $(1, -4)$, opens downward"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "Shift right 1, vertical stretch by 2, reflection across the x-axis, shift up 4; vertex $(1, 4)$, opens downward.",
+   "explanation": "Inside, $x - 1$ shifts right 1. Outside, multiply by 2 (stretch), negate (reflect across the x-axis), then add 4 (shift up). The vertex moves from $(0, 0)$ to $(1, 4)$.",
+   "hint": "Do the inside first. Then stretch and reflect. Shift up or down last.",
+   "tag": "transformation-order",
+   "fx": {
+    "parent": "square",
+    "a": -2,
+    "h": 1,
+    "k": 4,
+    "view": {
+     "xmin": -5,
+     "xmax": 7,
+     "ymin": -5,
+     "ymax": 6
+    }
+   }
+  },
+  {
+   "id": "Q3.9",
+   "level": "3",
+   "type": "typedEquation",
+   "prompt": "Write the equation of $f(x) = sqrt(x)$ reflected across the x-axis, compressed vertically by a factor of ${1/3}$, and shifted up 2 units.",
+   "parts": [
+    {
+     "kind": "eq",
+     "label": "$g(x) =$",
+     "answer": "-(1/3)sqrt(x)+2"
+    }
+   ],
+   "answerText": "$g(x) = -{1/3}sqrt(x) + 2$",
+   "explanation": "The reflection and the compression both multiply the outside: $-{1/3}$. Then add 2 outside for the shift up.",
+   "hint": "A reflection across the x-axis and a vertical compression both multiply the outside of the function.",
+   "tag": "vertical-stretch-compress",
+   "fx": {
+    "parent": "sqrt",
+    "a": -0.3333333333333333,
+    "k": 2,
+    "view": {
+     "xmin": -2,
+     "xmax": 10,
+     "ymin": -3,
+     "ymax": 4
+    }
+   }
+  },
+  {
+   "id": "Q3.10",
+   "level": "3",
+   "type": "coordinateEntry",
+   "prompt": "Find the vertex of $g(x) = -|x + 2| - 3$ and state whether it opens up or down.",
+   "parts": [
+    {
+     "kind": "point",
+     "label": "Vertex",
+     "x": "-2",
+     "y": "-3"
+    },
+    {
+     "kind": "select",
+     "label": "The graph opens",
+     "options": [
+      "Up",
+      "Down"
+     ],
+     "answer": 1
+    }
+   ],
+   "answerText": "Vertex $(-2, -3)$; opens downward.",
+   "explanation": "$x + 2 = 0$ at $x = -2$, then down 3, so the vertex is $(-2, -3)$. The negative outside reflects the V across the x-axis, so it opens downward.",
+   "hint": "The negative sign is outside the absolute value.",
+   "tag": "reflection-axis",
+   "fx": {
+    "parent": "abs",
+    "a": -1,
+    "h": -2,
+    "k": -3
+   }
+  },
+  {
+   "id": "GB5",
+   "level": "3",
+   "type": "graphMatch",
+   "parent": "cube",
+   "prompt": "Parent $f(x) = x^3$. Target: an S-shaped curve centered at $(1, 3)$ that falls from left to right.",
+   "target": {
+    "a": -1,
+    "b": 1,
+    "h": 1,
+    "k": 3
+   },
+   "min": 3,
+   "answerText": "$a = -1$, $b = 1$, $h = 1$, $k = 3$, so $g(x) = -(x - 1)^3 + 3$. Minimum moves: 3.",
+   "explanation": "$a = -1$ flips the curve so it falls, then $h = 1$ and $k = 3$ move its center to $(1, 3)$.",
+   "tag": "graph-builder"
+  },
+  {
+   "id": "Q4.1",
+   "level": "4",
+   "type": "multipleChoice",
+   "prompt": "$T(t)$ is the temperature in degrees Fahrenheit $t$ hours after midnight today. Tomorrow will be 5 degrees warmer at every hour. Which function models tomorrow?",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "$T(t) + 5$, a vertical shift up 5 degrees",
+      "$T(t + 5)$, a horizontal shift left 5 hours",
+      "$T(t - 5)$, a horizontal shift right 5 hours",
+      "$5T(t)$, a vertical stretch by a factor of 5"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "$T(t) + 5$, a vertical shift up 5 degrees.",
+   "explanation": "Every output (temperature) goes up 5 at the same time of day, so add 5 outside the function.",
+   "hint": "Is the change to the time (input) or to the temperature (output)?",
+   "tag": "vertical-shift"
+  },
+  {
+   "id": "Q4.2",
+   "level": "4",
+   "type": "multipleChoice",
+   "prompt": "$R(t)$ is hourly revenue at a coffee shop $t$ hours after 6 a.m. A second location has the same pattern but everything happens 2 hours later. Which function models the second location?",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "$R(t - 2)$, a horizontal shift right 2 hours",
+      "$R(t + 2)$, a horizontal shift left 2 hours",
+      "$R(t) - 2$, a vertical shift down 2",
+      "$R(t) + 2$, a vertical shift up 2"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "$R(t - 2)$, a horizontal shift right 2 hours.",
+   "explanation": "The second shop reaches each revenue level 2 hours later, so the input must be 2 larger to get the same output. That moves the graph right 2 hours.",
+   "hint": "Later in time means the graph moves which way along the t-axis?",
+   "tag": "horizontal-direction"
+  },
+  {
+   "id": "Q4.3",
+   "level": "4",
+   "type": "shortAnswer",
+   "time": 120,
+   "prompt": "A ball's height is $h(t) = -16(t - 2)^2 + 64$ feet after $t$ seconds. What is the maximum height and when does it occur? If the ball is launched from a platform 10 feet higher, what is the new function and maximum?",
+   "parts": [
+    {
+     "kind": "num",
+     "label": "Maximum height",
+     "suffix": "feet",
+     "answer": "64"
+    },
+    {
+     "kind": "num",
+     "label": "It occurs at",
+     "prefix": "$t =$",
+     "suffix": "seconds",
+     "answer": "2"
+    },
+    {
+     "kind": "eq",
+     "label": "New function: $h(t) + 10 =$",
+     "answer": "-16(t-2)^2+74",
+     "var": "t"
+    },
+    {
+     "kind": "num",
+     "label": "New maximum height",
+     "suffix": "feet",
+     "answer": "74"
+    }
+   ],
+   "answerText": "Maximum 64 feet at $t = 2$ seconds. New function $h(t) + 10 = -16(t - 2)^2 + 74$, maximum 74 feet at $t = 2$ seconds.",
+   "explanation": "The vertex of $-16(t - 2)^2 + 64$ is $(2, 64)$. Starting 10 feet higher adds 10 to every height, a vertical shift up 10, so the maximum becomes 74 feet, still at 2 seconds.",
+   "hint": "In $a(t - h)^2 + k$ with $a < 0$, the maximum is $k$ and it happens at $t = h$.",
+   "tag": "vertical-shift"
+  },
+  {
+   "id": "Q4.4",
+   "level": "4",
+   "type": "typedEquation",
+   "prompt": "A company's cost is $C(x) = 2000 + 15x$ dollars for $x$ units. If every cost doubles, write the new cost function.",
+   "parts": [
+    {
+     "kind": "eq",
+     "label": "$2C(x) =$",
+     "answer": "4000+30x"
+    }
+   ],
+   "answerText": "$2C(x) = 4000 + 30x$, a vertical stretch by a factor of 2.",
+   "explanation": "Doubling every cost multiplies the whole output by 2: $2(2000 + 15x) = 4000 + 30x$.",
+   "hint": "Multiply the whole cost function by 2.",
+   "tag": "vertical-stretch-compress"
+  },
+  {
+   "id": "Q4.5",
+   "level": "4",
+   "type": "multipleChoice",
+   "prompt": "$P(x)$ gives profit in dollars. The report must show profit in thousands of dollars. Which function should be graphed?",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "${P(x)/1000}$, a vertical compression by a factor of $1/1000$",
+      "$1000P(x)$, a vertical stretch by a factor of 1000",
+      "$P(x/1000)$, a horizontal stretch by a factor of 1000",
+      "$P(1000x)$, a horizontal compression by a factor of $1/1000$"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "${P(x)/1000}$, a vertical compression by a factor of $1/1000$.",
+   "explanation": "Converting dollars to thousands of dollars divides every output by 1000. The number of units (the input) does not change.",
+   "hint": "Is the change to the number of units or to the profit values?",
+   "tag": "vertical-stretch-compress"
+  },
+  {
+   "id": "Q4.6",
+   "level": "4",
+   "type": "multipleChoice",
+   "prompt": "$s(t)$ models a 4-minute song's sound wave. The song is played at double speed. Which function models it, and how long does it last?",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "$s(2t)$, a horizontal compression by a factor of $1/2$; it lasts 2 minutes",
+      "$s(t/2)$, a horizontal stretch by a factor of 2; it lasts 8 minutes",
+      "$2s(t)$, a vertical stretch by a factor of 2; it lasts 4 minutes",
+      "$s(2t)$, a horizontal stretch by a factor of 2; it lasts 8 minutes"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "$s(2t)$, a horizontal compression by a factor of $1/2$; it lasts 2 minutes.",
+   "explanation": "At double speed the song reaches each moment twice as fast, so the input is multiplied by 2. That squeezes the graph horizontally, and 4 minutes becomes 2.",
+   "hint": "Multiplying the input by 2 compresses the graph horizontally.",
+   "tag": "horizontal-stretch-compress"
+  },
+  {
+   "id": "Q4.7",
+   "level": "4",
+   "type": "multipleChoice",
+   "prompt": "$d(t)$ is a diver's depth below sea level in meters (positive numbers). Which function gives the diver's elevation relative to sea level?",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "$e(t) = -d(t)$, a reflection across the t-axis",
+      "$e(t) = d(-t)$, a reflection across the vertical axis",
+      "$e(t) = d(t) - 10$, a shift down 10 meters",
+      "$e(t) = 2d(t)$, a vertical stretch by a factor of 2"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "$e(t) = -d(t)$, a reflection across the t-axis.",
+   "explanation": "A diver 5 meters down has depth 5 but elevation $-5$. Negating every output flips the graph across the t-axis.",
+   "hint": "A diver 5 meters below the surface has what elevation?",
+   "tag": "reflection-axis"
+  },
+  {
+   "id": "Q4.8",
+   "level": "4",
+   "type": "multipleChoice",
+   "prompt": "$P(t)$ is a town's population $t$ years after 2000. Write a function $Q(t)$ for the population $t$ years after 2010.",
+   "parts": [
+    {
+     "kind": "mc",
+     "choices": [
+      "$Q(t) = P(t + 10)$, a horizontal shift left 10 years",
+      "$Q(t) = P(t - 10)$, a horizontal shift right 10 years",
+      "$Q(t) = P(t) + 10$, a vertical shift up 10",
+      "$Q(t) = P(t) - 10$, a vertical shift down 10"
+     ],
+     "answer": 0
+    }
+   ],
+   "answerText": "$Q(t) = P(t + 10)$, a horizontal shift left 10 years.",
+   "explanation": "Year $t$ after 2010 is year $t + 10$ after 2000, so $Q(0)$ must equal $P(10)$. That is a horizontal shift left 10 years.",
+   "hint": "$Q(0)$ is the population in 2010. Which value of $P$ is that?",
+   "tag": "horizontal-direction"
+  },
+  {
+   "id": "FC1",
+   "level": "F",
+   "type": "shortAnswer",
+   "prompt": "Describe every transformation from $f(x) = |x|$ to $g(x) = -3|x + 1| - 2$, in order. Then give the vertex.",
+   "parts": [
+    {
+     "kind": "order",
+     "label": "Tap the transformations in the order you apply them.",
+     "bank": [
+      "Shift left 1",
+      "Shift right 1",
+      "Vertical stretch by 3",
+      "Vertical compression by 1/3",
+      "Reflection across the x-axis",
+      "Reflection across the y-axis",
+      "Shift down 2",
+      "Shift up 2"
+     ],
+     "answer": [
+      0,
+      2,
+      4,
+      6
+     ],
+     "before": [
+      [
+       2,
+       6
+      ],
+      [
+       4,
+       6
+      ]
+     ]
+    },
+    {
+     "kind": "point",
+     "label": "Vertex",
+     "x": "-1",
+     "y": "-2"
+    },
+    {
+     "kind": "select",
+     "label": "The graph opens",
+     "options": [
+      "Up",
+      "Down"
+     ],
+     "answer": 1
+    }
+   ],
+   "answerText": "Shift left 1, vertical stretch by 3, reflection across the x-axis, shift down 2. Vertex $(-1, -2)$, opens downward.",
+   "explanation": "Inside, $x + 1$ shifts left 1. Outside, stretch by 3 and reflect across the x-axis, then shift down 2 last. If you shift down before stretching and reflecting, the vertex lands at $(-1, 6)$ instead.",
+   "tag": "transformation-order",
+   "fx": {
+    "parent": "abs",
+    "a": -3,
+    "h": -1,
+    "k": -2
+   }
+  },
+  {
+   "id": "FC2",
+   "level": "F",
+   "type": "typedEquation",
+   "prompt": "Write the equation of $f(x) = sqrt(x)$ reflected across the x-axis, shifted right 4 units, and shifted up 1 unit.",
+   "parts": [
+    {
+     "kind": "eq",
+     "label": "$g(x) =$",
+     "answer": "-sqrt(x-4)+1"
+    }
+   ],
+   "answerText": "$g(x) = -sqrt(x - 4) + 1$",
+   "explanation": "Reflect: $-sqrt(x)$. Right 4: $-sqrt(x - 4)$. Up 1: $-sqrt(x - 4) + 1$.",
+   "tag": "horizontal-direction",
+   "fx": {
+    "parent": "sqrt",
+    "a": -1,
+    "h": 4,
+    "k": 1,
+    "view": {
+     "xmin": -2,
+     "xmax": 12,
+     "ymin": -4,
+     "ymax": 4
+    }
+   }
+  },
+  {
+   "id": "FC3",
+   "level": "F",
+   "type": "writtenExplanation",
+   "prompt": "Explain in one sentence why $f(x - 3)$ moves the graph right rather than left.",
+   "parts": [
+    {
+     "kind": "text",
+     "label": "Your explanation"
+    }
+   ],
+   "answerText": "Sample: the input must be 3 units larger to produce the same output, so every point of the graph appears 3 units to the right.",
+   "explanation": "Your SI leader scores this one. Compare your sentence with the sample answer.",
+   "tag": "horizontal-direction"
+  }
+ ]
+}
+</script>
+<script>
+(function () {
+'use strict';
+/* ---------- small helpers ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function fmtN(v) {
+  if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v));
+  return String(parseFloat(v.toFixed(3)));
+}
+function fracStr(v) {
+  v = Math.abs(v);
+  if (v > 0 && v < 1) {
+    const n = 1 / v;
+    if (Math.abs(n - Math.round(n)) < 1e-6) return '1/' + Math.round(n);
+  }
+  return fmtN(v);
+}
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const ease = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+/* ---------- display math: "g(x) = -sqrt(x - 4) + 1" -> HTML ---------- */
+function mtok(s) {
+  const out = []; let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === ' ') { i++; continue; }
+    if (/[0-9.]/.test(c)) { let j = i; while (j < s.length && /[0-9.]/.test(s[j])) j++; out.push({ t: 'num', v: s.slice(i, j) }); i = j; continue; }
+    if (/[A-Za-z]/.test(c)) {
+      if (s.startsWith('sqrt', i)) { out.push({ t: 'fn', v: 'sqrt' }); i += 4; continue; }
+      if (s.startsWith('abs', i)) { out.push({ t: 'fn', v: 'abs' }); i += 3; continue; }
+      out.push({ t: 'id', v: c }); i++; continue;
+    }
+    if (s.startsWith('<=', i)) { out.push({ t: 'op', v: '\u2264' }); i += 2; continue; }
+    if (s.startsWith('>=', i)) { out.push({ t: 'op', v: '\u2265' }); i += 2; continue; }
+    out.push({ t: 'op', v: c }); i++;
+  }
+  return out;
+}
+function closeParen(toks, i) {
+  let d = 0;
+  for (let j = i; j < toks.length; j++) {
+    if (toks[j].t !== 'op') continue;
+    if (toks[j].v === '(') d++;
+    else if (toks[j].v === ')') { d--; if (d === 0) return j; }
+  }
+  return toks.length;
+}
+function mrender(toks) {
+  let h = '', prev = null, abs = 0, i = 0;
+  const operand = () => { prev = { t: 'x' }; };
+  while (i < toks.length) {
+    const t = toks[i];
+    if (t.t === 'num') { h += esc(t.v); operand(); i++; continue; }
+    if (t.t === 'id') { h += '<i>' + esc(t.v) + '</i>'; operand(); i++; continue; }
+    if (t.t === 'fn') {
+      i++; let inner = '';
+      if (toks[i] && toks[i].v === '(') { const j = closeParen(toks, i); inner = mrender(toks.slice(i + 1, j)); i = j + 1; }
+      else if (toks[i]) { inner = mrender([toks[i]]); i++; }
+      h += t.v === 'sqrt'
+        ? '<span class="rad"><span class="rs">\u221A</span><span class="rc">' + inner + '</span></span>'
+        : '|' + inner + '|';
+      operand(); continue;
+    }
+    const v = t.v;
+    if (v === '^') {
+      i++; let inner = '';
+      if (toks[i] && toks[i].v === '(') { const j = closeParen(toks, i); inner = mrender(toks.slice(i + 1, j)); i = j + 1; }
+      else if (toks[i] && toks[i].v === '-' && toks[i + 1]) { inner = '\u2212' + mrender([toks[i + 1]]); i += 2; }
+      else if (toks[i]) { inner = mrender([toks[i]]); i++; }
+      h += '<sup>' + inner + '</sup>'; operand(); continue;
+    }
+    if (v === '{') {
+      let d = 0, j = i + 1, slash = -1;
+      for (; j < toks.length; j++) {
+        const w = toks[j]; if (w.t !== 'op') continue;
+        if (w.v === '{' || w.v === '(') d++;
+        else if (w.v === '}') { if (d === 0) break; d--; }
+        else if (w.v === ')') d--;
+        else if (w.v === '/' && d === 0 && slash < 0) slash = j;
+      }
+      if (slash < 0) h += mrender(toks.slice(i + 1, j));
+      else h += '<span class="frac"><span class="fnum">' + mrender(toks.slice(i + 1, slash)) + '</span><span class="fden">' + mrender(toks.slice(slash + 1, j)) + '</span></span>';
+      i = j + 1; operand(); continue;
+    }
+    if (v === '-' || v === '+') {
+      const sym = v === '-' ? '\u2212' : '+';
+      const unary = !prev || prev.t === 'op';
+      h += unary ? sym : '<span class="bo">' + sym + '</span>';
+      prev = { t: 'op' }; i++; continue;
+    }
+    if (v === '|') {
+      const close = abs > 0 && prev && prev.t !== 'op';
+      if (close) { abs--; operand(); } else { abs++; prev = { t: 'op' }; }
+      h += '|'; i++; continue;
+    }
+    if (v === '(') { h += '('; prev = { t: 'op' }; i++; continue; }
+    if (v === ')') { h += ')'; operand(); i++; continue; }
+    if (v === '*') { h += '<span class="bo">\u00B7</span>'; prev = { t: 'op' }; i++; continue; }
+    if (v === '=' || v === '<' || v === '>' || v === '\u2264' || v === '\u2265') { h += '<span class="bo">' + esc(v) + '</span>'; prev = { t: 'op' }; i++; continue; }
+    if (v === ',') { h += ', '; prev = { t: 'op' }; i++; continue; }
+    h += esc(v); prev = { t: 'op' }; i++;
+  }
+  return h;
+}
+const math = s => '<span class="m">' + mrender(mtok(String(s))) + '</span>';
+const rich = s => String(s).split('$').map((seg, i) => (i % 2 ? math(seg) : esc(seg))).join('');
+const plain = s => String(s).replace(/\$/g, '').replace(/sqrt/g, '\u221A').replace(/[{}]/g, '')
+  .replace(/\^2/g, '\u00B2').replace(/\^3/g, '\u00B3').replace(/<=/g, '\u2264').replace(/>=/g, '\u2265');
+
+/* ---------- expression parser for typed answers ---------- */
+function normalizeInput(s, stripCommas) {
+  s = String(s == null ? '' : s).trim();
+  const eq = s.lastIndexOf('=');
+  if (eq >= 0) s = s.slice(eq + 1);
+  s = s.replace(/[\u2212\u2013\u2014]/g, '-').replace(/[\u00D7\u00B7\u22C5\u2219]/g, '*').replace(/\u00F7/g, '/')
+    .replace(/\u00B2/g, '^2').replace(/\u00B3/g, '^3').replace(/\u221A/g, 'sqrt')
+    .replace(/[[{]/g, '(').replace(/[\]}]/g, ')').toLowerCase();
+  if (stripCommas) s = s.replace(/,/g, '');
+  return s;
+}
+function etok(s) {
+  const out = []; let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (/\s/.test(c)) { i++; continue; }
+    if (/[0-9.]/.test(c)) {
+      let j = i; while (j < s.length && /[0-9.]/.test(s[j])) j++;
+      const t = s.slice(i, j);
+      if (t === '.' || (t.match(/\./g) || []).length > 1) throw new Error('number');
+      out.push({ t: 'num', v: parseFloat(t) }); i = j; continue;
+    }
+    if (/[a-z]/.test(c)) {
+      let j = i; while (j < s.length && /[a-z]/.test(s[j])) j++;
+      const w = s.slice(i, j); let k = 0;
+      while (k < w.length) {
+        if (w.startsWith('sqrt', k)) { out.push({ t: 'fn', v: 'sqrt' }); k += 4; }
+        else if (w.startsWith('abs', k)) { out.push({ t: 'fn', v: 'abs' }); k += 3; }
+        else if (w.startsWith('pi', k)) { out.push({ t: 'num', v: Math.PI }); k += 2; }
+        else { out.push({ t: 'id', v: w[k] }); k++; }
+      }
+      i = j; continue;
+    }
+    if ('+-*/^()|'.includes(c)) { out.push({ t: 'op', v: c }); i++; continue; }
+    throw new Error('char');
+  }
+  return out;
+}
+function compile(src, varName) {
+  const toks = etok(src); let p = 0, absDepth = 0;
+  if (!toks.length) throw new Error('empty');
+  const isOp = v => toks[p] && toks[p].t === 'op' && toks[p].v === v;
+  const expect = v => { if (!isOp(v)) throw new Error('expected ' + v); p++; };
+  function expr() {
+    let l = term();
+    while (isOp('+') || isOp('-')) { const o = toks[p++].v, a = l, b = term(); l = o === '+' ? x => a(x) + b(x) : x => a(x) - b(x); }
+    return l;
+  }
+  function startsPrimary() {
+    const t = toks[p]; if (!t) return false;
+    if (t.t !== 'op') return true;
+    if (t.v === '(') return true;
+    if (t.v === '|' && absDepth === 0) return true;
+    return false;
+  }
+  function term() {
+    let l = unary();
+    for (;;) {
+      if (isOp('*') || isOp('/')) { const o = toks[p++].v, a = l, b = unary(); l = o === '*' ? x => a(x) * b(x) : x => a(x) / b(x); }
+      else if (startsPrimary()) { const a = l, b = power(); l = x => a(x) * b(x); }
+      else break;
+    }
+    return l;
+  }
+  function unary() {
+    if (isOp('-')) { p++; const u = unary(); return x => -u(x); }
+    if (isOp('+')) { p++; return unary(); }
+    return power();
+  }
+  function power() {
+    const b = primary();
+    if (isOp('^')) { p++; const e = unary(); return x => Math.pow(b(x), e(x)); }
+    return b;
+  }
+  function primary() {
+    const t = toks[p]; if (!t) throw new Error('end');
+    if (t.t === 'num') { p++; const v = t.v; return () => v; }
+    if (t.t === 'id') {
+      p++;
+      if (varName && t.v === varName) return x => x;
+      if (t.v === 'e') return () => Math.E;
+      throw new Error('var');
+    }
+    if (t.t === 'fn') {
+      p++; let arg;
+      if (isOp('(')) { p++; const s = absDepth; absDepth = 0; arg = expr(); absDepth = s; expect(')'); }
+      else arg = power();
+      const f = t.v === 'sqrt' ? Math.sqrt : Math.abs;
+      return x => f(arg(x));
+    }
+    if (isOp('(')) { p++; const s = absDepth; absDepth = 0; const e = expr(); absDepth = s; expect(')'); return e; }
+    if (isOp('|')) { p++; absDepth++; const e = expr(); expect('|'); absDepth--; return x => Math.abs(e(x)); }
+    throw new Error('unexpected');
+  }
+  const f = expr();
+  if (p < toks.length) throw new Error('extra');
+  return f;
+}
+/* Same function? Compare at many x-values in the shared domain (tolerance 0.000001). */
+function sameFn(fs, ft) {
+  let valid = 0;
+  for (let i = 0; i < 120; i++) {
+    const x = i < 24 ? -11.5 + i + 0.137 : Math.random() * 24 - 12;
+    let ys, yt;
+    try { ys = fs(x); } catch (e) { ys = NaN; }
+    try { yt = ft(x); } catch (e) { yt = NaN; }
+    const vs = Number.isFinite(ys), vt = Number.isFinite(yt);
+    if (vs !== vt) return false;
+    if (!vs) continue;
+    valid++;
+    if (Math.abs(ys - yt) > 1e-6 * Math.max(1, Math.abs(yt))) return false;
+  }
+  return valid >= 10;
+}
+function parseNum(s) {
+  s = String(s || '').trim(); if (!s) return NaN;
+  try {
+    const n = normalizeInput(s, false);
+    const v = compile(n, null)(0);
+    return Number.isFinite(v) ? v : NaN;
+  } catch (e) { return NaN; }
+}
+function near(v, ans) {
+  const a = typeof ans === 'number' ? ans : parseNum(ans);
+  if (Math.abs(v - a) < 1e-6) return true;
+  return !Number.isInteger(a) && Math.abs(v - a) < 0.0051;
+}
+
+/* ---------- parent functions and transformations ---------- */
+const PARENTS = {
+  linear: { name: 'Linear', math: 'x', fn: u => u },
+  square: { name: 'Quadratic', math: 'x^2', fn: u => u * u },
+  cube: { name: 'Cubic', math: 'x^3', fn: u => u * u * u },
+  abs: { name: 'Absolute value', math: '|x|', fn: Math.abs },
+  sqrt: { name: 'Square root', math: 'sqrt(x)', fn: u => (u >= 0 ? Math.sqrt(u) : NaN) },
+  recip: { name: 'Reciprocal', math: '{1/x}', fn: u => (u !== 0 ? 1 / u : NaN) }
+};
+const PKEYS = ['linear', 'square', 'cube', 'abs', 'sqrt', 'recip'];
+const P_ = (P, k, d) => (P[k] == null ? d : P[k]);
+function transformedFn(pk, P) {
+  const f = PARENTS[pk].fn, a = P_(P, 'a', 1), b = P_(P, 'b', 1), h = P_(P, 'h', 0), k = P_(P, 'k', 0);
+  return x => a * f(b * (x - h)) + k;
+}
+function coefStr(v) {
+  const s = fmtN(v);
+  if (s.includes('.') && s.split('.')[1].length > 2) { const f = fracStr(v); if (f.startsWith('1/')) return '{' + f + '}'; }
+  return s;
+}
+function formatTransformed(pk, P, v) {
+  v = v || 'x';
+  const a = P_(P, 'a', 1), b = P_(P, 'b', 1), h = P_(P, 'h', 0), k = P_(P, 'k', 0);
+  let inner = v;
+  if (h) inner = v + (h > 0 ? ' - ' : ' + ') + fmtN(Math.abs(h));
+  if (b !== 1) {
+    if (b === -1) inner = h ? '-(' + inner + ')' : '-' + v;
+    else inner = (b < 0 ? '-' : '') + coefStr(Math.abs(b)) + (h ? '(' + inner + ')' : v);
+  }
+  const simple = inner === v;
+  let body;
+  switch (pk) {
+    case 'linear': body = inner; break;
+    case 'square': body = simple ? v + '^2' : '(' + inner + ')^2'; break;
+    case 'cube': body = simple ? v + '^3' : '(' + inner + ')^3'; break;
+    case 'abs': body = '|' + inner + '|'; break;
+    case 'sqrt': body = 'sqrt(' + inner + ')'; break;
+    default: body = '{1/' + inner + '}';
+  }
+  const wrap = pk === 'linear' && !simple ? '(' + body + ')' : body;
+  let s;
+  if (a === 0) return fmtN(k);
+  if (a === 1) s = body;
+  else if (a === -1) s = '-' + wrap;
+  else s = (a < 0 ? '-' : '') + coefStr(Math.abs(a)) + wrap;
+  if (k) s += (k > 0 ? ' + ' : ' - ') + fmtN(Math.abs(k));
+  return s;
+}
+/* A transform state maps parent point (u, f(u)) to (sx*u + h, sy*f(u) + k), with sx = 1/b and sy = a. */
+const paramsToT = P => ({ sx: 1 / P_(P, 'b', 1), h: P_(P, 'h', 0), sy: P_(P, 'a', 1), k: P_(P, 'k', 0) });
+const lerpT = (A, B, q) => ({ sx: A.sx + (B.sx - A.sx) * q, h: A.h + (B.h - A.h) * q, sy: A.sy + (B.sy - A.sy) * q, k: A.k + (B.k - A.k) * q });
+const mapPt = (pt, T) => [T.sx * pt[0] + T.h, T.sy * pt[1] + T.k];
+function transformSteps(P) {
+  const a = P_(P, 'a', 1), b = P_(P, 'b', 1), h = P_(P, 'h', 0), k = P_(P, 'k', 0);
+  const steps = []; let T = { sx: 1, h: 0, sy: 1, k: 0 };
+  const push = (label, patch) => { const to = Object.assign({}, T, patch); steps.push({ label, from: T, to }); T = to; };
+  if (b < 0) push('Reflect across the y-axis', { sx: -1 });
+  if (b !== 0 && Math.abs(b) !== 1) push((Math.abs(b) > 1 ? 'Horizontal compression' : 'Horizontal stretch') + ' by a factor of ' + fracStr(1 / Math.abs(b)), { sx: 1 / b });
+  if (h) push((h > 0 ? 'Shift right ' : 'Shift left ') + fmtN(Math.abs(h)), { h });
+  if (a !== 0 && Math.abs(a) !== 1) push((Math.abs(a) > 1 ? 'Vertical stretch' : 'Vertical compression') + ' by a factor of ' + fracStr(Math.abs(a)), { sy: Math.abs(a) });
+  if (a < 0) push('Reflect across the x-axis', { sy: a });
+  if (k) push((k > 0 ? 'Shift up ' : 'Shift down ') + fmtN(Math.abs(k)), { k });
+  return steps;
+}
+
+/* ---------- graph plotting on canvas ---------- */
+const plots = new Set();
+const cssVar = name => {
+  try { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#000'; } catch (e) { return '#000'; }
+};
+class Plot {
+  constructor(holder, view) {
+    this.holder = holder;
+    this.view = Object.assign({ xmin: -8, xmax: 8, ymin: -6, ymax: 6 }, view || {});
+    this.c = document.createElement('canvas');
+    this.c.setAttribute('aria-hidden', 'true');
+    holder.appendChild(this.c);
+    let ctx = null;
+    try { ctx = this.c.getContext ? this.c.getContext('2d') : null; } catch (e) { ctx = null; }
+    this.ctx = ctx;
+    this.paint = () => {};
+    if (typeof ResizeObserver !== 'undefined') { this.ro = new ResizeObserver(() => this.render()); this.ro.observe(holder); }
+    plots.add(this);
+    this.render();
+  }
+  destroy() { if (this.ro) this.ro.disconnect(); plots.delete(this); }
+  render() {
+    const ctx = this.ctx; if (!ctx) return;
+    const r = this.holder.getBoundingClientRect();
+    const w = Math.max(40, Math.round(r.width)), h = Math.max(40, Math.round(r.height));
+    const dpr = Math.min(3, window.devicePixelRatio || 1);
+    if (this.c.width !== Math.round(w * dpr) || this.c.height !== Math.round(h * dpr)) { this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.w = w; this.h = h;
+    const V = this.view, cx = (V.xmin + V.xmax) / 2, cy = (V.ymin + V.ymax) / 2;
+    const upp = Math.max((V.xmax - V.xmin) / w, (V.ymax - V.ymin) / h);
+    this.upp = upp; this.x0 = cx - upp * w / 2; this.x1 = cx + upp * w / 2; this.y0 = cy - upp * h / 2; this.y1 = cy + upp * h / 2;
+    ctx.clearRect(0, 0, w, h);
+    this.col = { grid: cssVar('--grid'), major: cssVar('--grid-major'), ink: cssVar('--ink'), ink2: cssVar('--ink-2'), sheet: cssVar('--sheet') };
+    this.grid();
+    this.paint(this);
+  }
+  X(x) { return (x - this.x0) / this.upp; }
+  Y(y) { return (this.y1 - y) / this.upp; }
+  grid() {
+    const ctx = this.ctx, C = this.col;
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(this.x0); x <= this.x1; x++) {
+      ctx.strokeStyle = x % 5 === 0 ? C.major : C.grid; ctx.beginPath();
+      const px = Math.round(this.X(x)) + 0.5; ctx.moveTo(px, 0); ctx.lineTo(px, this.h); ctx.stroke();
+    }
+    for (let y = Math.ceil(this.y0); y <= this.y1; y++) {
+      ctx.strokeStyle = y % 5 === 0 ? C.major : C.grid; ctx.beginPath();
+      const py = Math.round(this.Y(y)) + 0.5; ctx.moveTo(0, py); ctx.lineTo(this.w, py); ctx.stroke();
+    }
+    const ax = this.Y(0), ay = this.X(0);
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath();
+    ctx.moveTo(0, ax); ctx.lineTo(this.w, ax); ctx.moveTo(ay, 0); ctx.lineTo(ay, this.h); ctx.stroke();
+    ctx.fillStyle = C.ink2; ctx.font = '12px "Atkinson Hyperlegible", system-ui, sans-serif';
+    const step = (this.x1 - this.x0) > 22 ? 4 : 2;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    const ly = Math.min(this.h - 15, Math.max(2, ax + 4));
+    for (let x = Math.ceil(this.x0 / step) * step; x <= this.x1; x += step) { if (x) ctx.fillText(String(x).replace('-', '\u2212'), this.X(x), ly); }
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    const lx = Math.min(this.w - 3, Math.max(24, ay - 5));
+    for (let y = Math.ceil(this.y0 / step) * step; y <= this.y1; y += step) { if (y) ctx.fillText(String(y).replace('-', '\u2212'), lx, this.Y(y)); }
+    ctx.font = 'italic 14px "STIX Two Text", Georgia, serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillText('x', this.w - 6, Math.min(this.h - 4, Math.max(18, ax - 3)));
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('y', Math.min(this.w - 14, Math.max(4, ay + 6)), 4);
+  }
+  curve(pk, T, st) {
+    const ctx = this.ctx; if (!ctx) return;
+    const f = PARENTS[pk].fn, sx = T.sx, h = T.h || 0, sy = T.sy, k = T.k || 0;
+    ctx.save();
+    ctx.strokeStyle = st.color; ctx.lineWidth = st.width || 3; ctx.globalAlpha = st.alpha == null ? 1 : st.alpha;
+    ctx.setLineDash(st.dash || []); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    const lim = 1e5, cl = v => Math.max(-lim, Math.min(lim, v));
+    if (!Number.isFinite(sx)) {
+      const y0 = sy * f(0) + k;
+      if (Number.isFinite(y0)) { ctx.beginPath(); ctx.moveTo(0, this.Y(y0)); ctx.lineTo(this.w, this.Y(y0)); ctx.stroke(); }
+      ctx.restore(); return;
+    }
+    let u0, u1;
+    if (Math.abs(sx) > 0.02) { u0 = (this.x0 - 1 - h) / sx; u1 = (this.x1 + 1 - h) / sx; if (u0 > u1) { const t = u0; u0 = u1; u1 = t; } }
+    else { u0 = -30; u1 = 30; }
+    const ranges = [];
+    if (pk === 'sqrt') { const a = Math.max(0, u0); if (u1 > a) ranges.push([a, u1, 'q']); }
+    else if (pk === 'recip') {
+      if (u0 < 0) ranges.push([Math.min(u1, -1e-3), u0, 'g']);
+      if (u1 > 0) ranges.push([Math.max(u0, 1e-3), u1, 'g']);
+    } else ranges.push([u0, u1, 'l']);
+    const N = 800;
+    for (const [a, b, mode] of ranges) {
+      ctx.beginPath(); let pen = false;
+      for (let i = 0; i <= N; i++) {
+        const t = i / N; let u;
+        if (mode === 'q') u = a + (b - a) * t * t;
+        else if (mode === 'g' && Math.sign(a) === Math.sign(b) && Math.abs(b) > Math.abs(a)) u = a * Math.pow(b / a, t);
+        else u = a + (b - a) * t;
+        const y = f(u);
+        if (!Number.isFinite(y)) { pen = false; continue; }
+        const px = cl(this.X(sx * u + h)), py = cl(this.Y(sy * y + k));
+        if (!pen) { ctx.moveTo(px, py); pen = true; } else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+    if (pk === 'sqrt' && st.endpoint) {
+      ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.fillStyle = st.color;
+      ctx.beginPath(); ctx.arc(this.X(h), this.Y(k), 4.5, 0, Math.PI * 2); ctx.fill();
+    }
+    if (pk === 'recip' && st.asym) {
+      ctx.setLineDash([5, 6]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.8;
+      ctx.beginPath(); ctx.moveTo(this.X(h), 0); ctx.lineTo(this.X(h), this.h);
+      ctx.moveTo(0, this.Y(k)); ctx.lineTo(this.w, this.Y(k)); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  dot(x, y, color, hollow) {
+    const ctx = this.ctx; if (!ctx) return;
+    ctx.save(); ctx.setLineDash([]); ctx.beginPath(); ctx.arc(this.X(x), this.Y(y), hollow ? 5.5 : 6.5, 0, Math.PI * 2);
+    if (hollow) { ctx.fillStyle = this.col.sheet; ctx.fill(); ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.stroke(); }
+    else { ctx.fillStyle = color; ctx.fill(); ctx.strokeStyle = this.col.sheet; ctx.lineWidth = 2; ctx.stroke(); }
+    ctx.restore();
+  }
+}
+
+/* ---------- data ---------- */
+const BANK = JSON.parse(document.getElementById('question-bank').textContent);
+const LEVELS = BANK.levels;
+const LEVEL = Object.fromEntries(LEVELS.map(l => [l.id, l]));
+const Q = Object.fromEntries(BANK.questions.map(q => [q.id, q]));
+BANK.questions.forEach(q => { if (q.type === 'graphMatch') { q.fx = Object.assign({ parent: q.parent }, q.target); q.parts = []; } });
+const REFLECT_IDS = BANK.questions.filter(q => q.tag === 'reflection-axis').map(q => q.id);
+const isGradable = q => q.type === 'graphMatch' || !q.parts.every(p => p.kind === 'text');
+
+const TEAMS = [{ id: 'shift', name: 'Team Shift' }, { id: 'flip', name: 'Team Flip' }, { id: 'stretch', name: 'Team Stretch' }, { id: 'squeeze', name: 'Team Squeeze' }];
+const teamOf = id => TEAMS.find(t => t.id === id) || TEAMS[0];
+const AVATARS = ['\uD83E\uDD8A', '\uD83D\uDC19', '\uD83E\uDD89', '\uD83D\uDC22', '\uD83D\uDC38', '\uD83E\uDD84', '\uD83D\uDC1D', '\uD83D\uDC27'];
+const RANKS = [[0, 'Rookie'], [500, 'Shifter'], [1200, 'Reflector'], [2000, 'Stretcher'], [3000, 'Transformation Master']];
+const BADGES = [
+  { id: 'glitch', name: 'Glitch Hunter', icon: '\uD83D\uDD0D', desc: 'Find all 3 errors in Spot the Glitch.' },
+  { id: 'shooter', name: 'Shift Shooter', icon: '\uD83C\uDFAF', desc: 'Answer 8 or more shift questions correctly in one run.' },
+  { id: 'mirror', name: 'Mirror Master', icon: '\uD83E\uDE9E', desc: 'Answer every reflection question correctly.' },
+  { id: 'stretch', name: 'Stretch Specialist', icon: '\u2B50', desc: 'Earn 3 stars on 3 Graph Builder rounds.' },
+  { id: 'boss', name: 'Boss Slayer', icon: '\uD83C\uDFC6', desc: 'Defeat the Model Monster.' },
+  { id: 'fire', name: 'On Fire', icon: '\uD83D\uDD25', desc: 'Reach a 5-question streak.' },
+  { id: 'comeback', name: 'Comeback Kid', icon: '\uD83D\uDCC8', desc: 'Replay a level and beat your best score.' },
+  { id: 'explainer', name: 'Explainer', icon: '\uD83D\uDCAC', desc: 'Earn 3 explanation bonuses.' }
+];
+const BADGE = Object.fromEntries(BADGES.map(b => [b.id, b]));
+const POWERUPS = {
+  peek: { name: 'Graph Peek', desc: 'Shows the graph of the current equation for 3 seconds. Earned at a 3-question streak.' },
+  fifty: { name: '50/50', desc: 'Removes two wrong choices. Earned at a 5-question streak.' },
+  freeze: { name: 'Time Freeze', desc: 'Adds 15 seconds to the timer. Earned once per level by answering 3 questions with no hints.' }
+};
+const BLOCKED = ['shpx', 'fuvg', 'ovgpu', 'phag', 'qvpx', 'pbpx', 'chffl', 'nffubyr', 'onfgneq', 'fyhg', 'juber', 'avtt', 'snt', 'ergneq', 'cravf', 'intvan', 'cbea', 'frk', 'anmv', 'uvgyre', 'encr', 'xxx', 'gjng', 'jnax', 'obbo', 'gvgf']
+  .map(w => w.replace(/[a-z]/g, c => String.fromCharCode((c.charCodeAt(0) - 84) % 26 + 97)));
+
+/* ---------- saved state ---------- */
+const KEY = 'transformation-quest-v1';
+const fresh = () => ({ profile: null, levels: {}, powerups: { peek: 0, fifty: 0, freeze: 0 }, badges: [], reflectOk: [], threeStars: [], explainCount: 0, bestStreak: 0, exit: null, settings: { timer: 'normal', unlockAll: false } });
+let S = fresh();
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) { const d = JSON.parse(raw); const f = fresh(); S = Object.assign(f, d); S.settings = Object.assign(fresh().settings, d.settings || {}); S.powerups = Object.assign(fresh().powerups, d.powerups || {}); }
+} catch (e) { /* storage unavailable: play in memory */ }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
+const session = { streak: 0 };
+
+const totalXP = () => Object.values(S.levels).reduce((s, l) => s + (l.bestXP || 0), 0);
+function rankInfo(xp) {
+  let i = 0; while (i + 1 < RANKS.length && xp >= RANKS[i + 1][0]) i++;
+  const next = RANKS[i + 1];
+  return { name: RANKS[i][1], next: next ? next[1] : null, nextAt: next ? next[0] : null, frac: next ? (xp - RANKS[i][0]) / (next[0] - RANKS[i][0]) : 1 };
+}
+const isUnlocked = i => i === 0 || S.settings.unlockAll || ((S.levels[LEVELS[i - 1].id] || {}).bestAcc || 0) >= 0.7;
+const starsFor = acc => (acc >= 0.9999 ? 3 : acc >= 0.85 ? 2 : acc >= 0.7 ? 1 : 0);
+const starStr = n => '\u2605'.repeat(n) + '\u2606'.repeat(3 - n);
+const fmtXP = n => Math.round(n).toLocaleString('en-US');
+const pct = v => Math.round(v * 100) + '%';
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+
+function toast(msg) {
+  const box = $('#toasts'); if (!box) return;
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; box.appendChild(t);
+  while (box.children.length > 2) box.firstElementChild.remove();
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 350); }, 2600);
+}
+function award(id) {
+  if (S.badges.includes(id)) return;
+  S.badges.push(id); if (run) run.newBadges.push(id);
+  toast('Badge earned: ' + BADGE[id].icon + ' ' + BADGE[id].name); save();
+}
+
+/* ---------- screen plumbing ---------- */
+const app = document.getElementById('app');
+let cleanups = [];
+let run = null, qs = null, gb = null, timerId = null;
+function show(html, after) {
+  stopTimer();
+  cleanups.forEach(f => { try { f(); } catch (e) { /* ignore */ } }); cleanups = [];
+  app.innerHTML = html; window.scrollTo(0, 0);
+  if (after) after();
+  const f = app.querySelector('[data-focus]'); if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+}
+function mkPlot(el, view) { const p = new Plot(el, view); cleanups.push(() => p.destroy()); return p; }
+document.addEventListener('click', e => {
+  const n = e.target.closest('[data-nav]'); if (!n) return;
+  run = null;
+  const to = n.dataset.nav;
+  if (to === 'profile') renderProfile(); else if (to === 'settings') renderSettings(); else renderMap();
+});
+if (window.matchMedia) {
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const rerender = () => plots.forEach(p => p.render());
+  if (mq.addEventListener) mq.addEventListener('change', rerender);
+}
+const LOCK = '<svg class="lock" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2.5" y="7" width="11" height="8" rx="1.6" fill="currentColor"/><path d="M5 7V5.2a3 3 0 0 1 6 0V7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+const MONSTER = (cls) => `<svg class="monster ${cls || ''}" viewBox="0 0 220 170" role="img" aria-label="The Model Monster, a creature shaped like a downward parabola with absolute-value teeth">
+  <g class="mon-body">
+    <path d="M78 72 C 70 50 58 40 38 36" fill="none" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M142 72 C 150 50 162 40 182 36" fill="none" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M18 158 Q110 -38 202 158 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="88" cy="100" r="14" fill="var(--sheet)" stroke="var(--ink)" stroke-width="3"/><circle class="pupil" cx="92" cy="103" r="6" fill="var(--ink)"/>
+    <circle cx="132" cy="100" r="14" fill="var(--sheet)" stroke="var(--ink)" stroke-width="3"/><circle class="pupil" cx="128" cy="103" r="6" fill="var(--ink)"/>
+    <path d="M74 126 L146 126 L140 146 L80 146 Z" fill="var(--ink)"/>
+    <path d="M78 126 L86 137 L94 126 Z M94 126 L102 137 L110 126 Z M110 126 L118 137 L126 126 Z M126 126 L134 137 L142 126 Z" fill="var(--sheet)"/>
+  </g></svg>`;
+
+/* ---------- join ---------- */
+function renderJoin(edit) {
+  const p = S.profile || {};
+  let av = p.avatar || AVATARS[0], team = p.team || 'random';
+  show(`<main class="wrap join">
+    <section class="hero">
+      <h1 data-focus tabindex="-1">Transformation Quest</h1>
+      <div class="hero-row">
+        <p class="lede">Shift, reflect, stretch and squeeze your way through five levels of function transformations, then take on the Model Monster.</p>
+        <figure class="hero-fig">
+          <div class="graph hero-graph" id="hero-graph" role="img" aria-label="A parabola moving through a series of shifts, reflections and stretches."></div>
+          <figcaption class="hero-eq" id="hero-eq"></figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="sheet stack" aria-labelledby="join-h">
+      <h2 id="join-h">${edit ? 'Edit your player' : 'Join the quest'}</h2>
+      <div class="fieldblock">
+        <label class="lab" for="nick">Nickname</label>
+        <input id="nick" type="text" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(p.nick || '')}" aria-describedby="nick-help">
+        <p class="help" id="nick-help">Use a nickname, not your real name: 2 to 16 letters, numbers or spaces.</p>
+        <p class="err" id="nick-err" role="alert"></p>
+      </div>
+      <fieldset class="fieldblock"><legend class="lab">Avatar</legend>
+        <div class="avatars">${AVATARS.map(a => `<button type="button" class="av" data-av="${a}" aria-pressed="${a === av}">${a}</button>`).join('')}</div>
+      </fieldset>
+      <fieldset class="fieldblock"><legend class="lab">Team</legend>
+        <p class="help">Pick the team your SI leader gave you, or let the game choose.</p>
+        <div class="teams">${TEAMS.map(t => `<button type="button" class="teambtn" data-team="${t.id}" aria-pressed="${team === t.id}" style="--tc:var(--t-${t.id})"><span class="tdot" aria-hidden="true"></span>${t.name}</button>`).join('')}
+          <button type="button" class="teambtn" data-team="random" aria-pressed="${team === 'random'}"><span class="tdot rnd" aria-hidden="true"></span>Surprise me</button></div>
+      </fieldset>
+      <button class="btn primary big" id="go" type="button">${edit ? 'Save player' : 'Start the quest'}</button>
+      ${edit ? '' : '<p class="help">Your progress saves in this browser on this device.</p>'}
+    </section>
+  </main>`, () => {
+    $$('.av').forEach(b => b.addEventListener('click', () => { av = b.dataset.av; $$('.av').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+    $$('.teambtn').forEach(b => b.addEventListener('click', () => { team = b.dataset.team; $$('.teambtn').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+    const go = () => {
+      const nick = $('#nick').value.trim().replace(/\s+/g, ' ');
+      const err = $('#nick-err');
+      if (!/^[A-Za-z0-9 _-]{2,16}$/.test(nick)) { err.textContent = 'Use 2 to 16 letters, numbers, spaces, dashes or underscores.'; $('#nick').focus(); return; }
+      const flat = nick.toLowerCase().replace(/[^a-z]/g, '').replace(/0/g, 'o');
+      if (BLOCKED.some(w => flat.includes(w))) { err.textContent = 'Please choose a different nickname.'; $('#nick').focus(); return; }
+      const finalTeam = team === 'random' ? TEAMS[Math.floor(Math.random() * TEAMS.length)].id : team;
+      S.profile = { nick, avatar: av, team: finalTeam }; save();
+      if (!edit) toast('Welcome to ' + teamOf(finalTeam).name + ', ' + nick + '!');
+      renderMap();
+    };
+    $('#go').addEventListener('click', go);
+    $('#nick').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    heroAnimation();
+  });
+}
+function heroAnimation() {
+  const plot = mkPlot($('#hero-graph'), { xmin: -7, xmax: 7, ymin: -5, ymax: 6 });
+  const eqEl = $('#hero-eq');
+  const seq = [{ a: 1, h: 0, k: 0 }, { a: 1, h: 3, k: 0 }, { a: -1, h: 3, k: 3 }, { a: -0.5, h: -2, k: 3 }, { a: 2, h: -2, k: -3 }];
+  const parentT = { sx: 1, h: 0, sy: 1, k: 0 };
+  let T = paramsToT(seq[0]);
+  plot.paint = p => {
+    p.curve('square', parentT, { color: cssVar('--curve-parent'), dash: [6, 6], width: 2 });
+    p.curve('square', T, { color: cssVar('--blue'), width: 4 });
+  };
+  const setEq = P => { eqEl.innerHTML = math('g(x) = ' + formatTransformed('square', P)); };
+  if (reduceMotion) { T = paramsToT(seq[2]); setEq(seq[2]); plot.render(); return; }
+  setEq(seq[0]);
+  let cur = 0, start = null, from = T, to = T, raf = null, settled = false;
+  const tick = now => {
+    if (!plot.c.isConnected) return;
+    if (start === null) start = now;
+    if (now - start > 2800) { cur = (cur + 1) % seq.length; from = to; to = paramsToT(seq[cur]); start = now; settled = false; setEq(seq[cur]); }
+    const q = Math.min(1, (now - start) / 1000);
+    if (!settled) { T = lerpT(from, to, ease(q)); plot.render(); if (q >= 1) settled = true; }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+  cleanups.push(() => cancelAnimationFrame(raf));
+}
+
+/* ---------- top bar and map ---------- */
+function topbar(current) {
+  const p = S.profile, t = teamOf(p.team), xp = totalXP();
+  const nav = [['map', 'Map'], ['profile', 'Progress'], ['settings', 'Settings']].filter(n => n[0] !== current);
+  return `<header class="topbar"><div class="topbar-in">
+    <div class="me"><span class="avatar" aria-hidden="true">${p.avatar}</span><span class="me-text"><span class="nick">${esc(p.nick)}</span><span class="team-tag" style="--tc:var(--t-${p.team})">${t.name}</span></span></div>
+    <div class="xpbox"><span class="xp-num">${fmtXP(xp)} XP</span><span class="rank">${rankInfo(xp).name}</span></div>
+    <nav class="nav" aria-label="Main">${nav.map(n => `<button type="button" class="btn small" data-nav="${n[0]}">${n[1]}</button>`).join('')}</nav>
+  </div></header>`;
+}
+const pupChip = k => `<span class="pup" title="${esc(POWERUPS[k].desc)}">${POWERUPS[k].name}<b>${S.powerups[k]}</b></span>`;
+function levelRow(L, i) {
+  const un = isUnlocked(i), rec = S.levels[L.id], st = rec ? starsFor(rec.bestAcc) : 0, passed = rec && rec.bestAcc >= 0.7;
+  const off = [0, 0.6, 1, 0.6, 0, 0.6][i] || 0;
+  const prev = i > 0 ? LEVELS[i - 1] : null;
+  let meta;
+  if (!un) meta = `<span class="lockline">${LOCK}Reach 70% on ${esc(prev.name)} to unlock.</span>`;
+  else if (rec) meta = `<span class="stars" aria-label="${st} of 3 stars">${starStr(st)}</span><span>Best ${pct(rec.bestAcc)}, ${fmtXP(rec.bestXP)} XP</span>`;
+  else meta = '<span class="muted">Not played yet</span>';
+  return `<button type="button" class="lvl ${!un ? 'locked' : passed ? 'done' : 'open'}" data-level="${L.id}" data-i="${i}" style="--off:${off}" ${!un ? 'aria-disabled="true"' : ''}>
+    <span class="node" aria-hidden="true">${!un ? LOCK : L.num == null ? '\u2691' : L.num}</span>
+    <span class="lvl-text"><span class="lvl-name"><span class="sr">${L.num == null ? '' : 'Level ' + L.num + ': '}</span>${esc(L.name)}</span><span class="lvl-desc">${esc(L.blurb)}</span><span class="lvl-meta">${meta}</span></span>
+  </button>`;
+}
+function drawTrail(map) {
+  const svg = $('#trail', map); if (!svg) return;
+  const mr = map.getBoundingClientRect();
+  const nodes = $$('.node', map).map(n => { const r = n.getBoundingClientRect(); return { x: r.left - mr.left + r.width / 2, y: r.top - mr.top + r.height / 2 }; });
+  svg.setAttribute('viewBox', `0 0 ${mr.width} ${mr.height}`);
+  let d = '';
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const a = nodes[i], b = nodes[i + 1], dy = (b.y - a.y) / 2;
+    d += `<path d="M${a.x} ${a.y} C${a.x} ${a.y + dy} ${b.x} ${b.y - dy} ${b.x} ${b.y}" class="seg ${isUnlocked(i + 1) ? 'on' : 'off'}"/>`;
+  }
+  svg.innerHTML = d;
+}
+function renderMap() {
+  if (!S.profile) return renderJoin(false);
+  run = null;
+  const xp = totalXP(), R = rankInfo(xp);
+  show(`${topbar('map')}<main class="wrap stack">
+    <section class="sheet rankcard">
+      <h2 data-focus tabindex="-1">Level map</h2>
+      <div class="rankrow"><span class="rankname">${R.name}</span><span class="muted">${R.next ? fmtXP(R.nextAt - xp) + ' XP to ' + R.next : 'Top rank reached'}</span></div>
+      <div class="meter" role="progressbar" aria-label="Progress to the next rank" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(R.frac * 100)}"><span style="width:${R.frac * 100}%"></span></div>
+      <div class="pups" aria-label="Your power-ups">${pupChip('peek')}${pupChip('fifty')}${pupChip('freeze')}</div>
+    </section>
+    <div class="map" id="map"><svg class="trail" id="trail" aria-hidden="true" preserveAspectRatio="none"></svg>${LEVELS.map(levelRow).join('')}</div>
+  </main>`, () => {
+    const map = $('#map'); const draw = () => drawTrail(map); draw();
+    if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(draw); ro.observe(map); cleanups.push(() => ro.disconnect()); }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (map.isConnected) draw(); });
+    $$('.lvl', map).forEach(b => b.addEventListener('click', () => {
+      if (b.classList.contains('locked')) { const prev = LEVELS[+b.dataset.i - 1]; toast('Reach 70% on ' + prev.name + ' to unlock this level.'); return; }
+      startLevel(b.dataset.level);
+    }));
+  });
+}
+
+/* ---------- running a level ---------- */
+function startLevel(id) {
+  const L = LEVEL[id];
+  run = { L, idx: 0, xp: 0, correct: 0, answered: 0, hintsUsed: 0, freezeGiven: false, newBadges: [], glitch: 0, shift: 0, exit: {},
+    boss: L.boss ? { hp: 6, max: 6, hearts: 3, defeated: false, lost: false } : null };
+  renderItem();
+}
+function renderItem() {
+  if (!run) return renderMap();
+  if ((run.boss && run.boss.lost) || run.idx >= run.L.items.length) return endLevel();
+  const q = Q[run.L.items[run.idx]];
+  if (q.type === 'graphMatch') renderGB(q); else renderQuestion(q);
+}
+function runbar() {
+  const L = run.L, n = L.items.length;
+  const mult = session.streak >= 5 ? '2\u00D7' : session.streak >= 3 ? '1.5\u00D7' : '';
+  return `<header class="topbar"><div class="topbar-in runbar">
+    <button type="button" class="btn small" id="quit">Leave</button>
+    <div class="rb-mid"><span class="rb-level">${esc(L.name)}</span><span class="rb-prog">${Math.min(run.idx + 1, n)} of ${n}</span></div>
+    <div class="rb-stats"><span class="streak" aria-label="Streak ${session.streak}${mult ? ', ' + mult + ' XP' : ''}"><span aria-hidden="true">\uD83D\uDD25 ${session.streak}${mult ? ' <small>' + mult + '</small>' : ''}</span></span><span class="rb-xp">${fmtXP(run.xp)} XP</span></div>
+  </div></header>`;
+}
+function bindQuit() {
+  const b = $('#quit'); if (!b) return;
+  b.addEventListener('click', () => {
+    if (b.dataset.armed) { run = null; renderMap(); return; }
+    b.dataset.armed = '1'; b.textContent = 'Tap to confirm'; b.classList.add('warn');
+    setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = 'Leave'; b.classList.remove('warn'); } }, 3000);
+  });
+}
+function timeLimit(q) {
+  if (run.L.final || S.settings.timer === 'off') return 0;
+  const base = q.time || run.L.time || 0;
+  return S.settings.timer === 'extra' ? base * 2 : base;
+}
+function bossPanel(ev) {
+  const B = run.boss;
+  const hp = ev ? ev.prevHp : B.hp, hearts = ev ? ev.prevHearts : B.hearts;
+  const msgs = {
+    hit: 'Direct hit! The Model Monster loses 1 health.',
+    defeat: 'The Model Monster has been vertically compressed by a factor of 0. Victory!',
+    miss: 'The Model Monster strikes back. You lost a heart.',
+    lost: 'Out of hearts. The Model Monster wins this round.',
+    bonus: 'Bonus XP. The Model Monster is already down.',
+    flat: 'The Model Monster is already down, so no heart lost.'
+  };
+  const msg = ev ? msgs[ev.ev] : (B.defeated ? 'The Model Monster is down. Finish the remaining scenarios for XP.' : 'Each correct answer deals 1 damage. Each wrong answer costs a heart.');
+  const down = B.defeated && !(ev && ev.ev === 'defeat');
+  return `<section class="sheet boss" aria-label="Boss battle">
+    ${MONSTER(down ? 'down' : '')}
+    <div class="boss-info">
+      <div class="boss-name">Model Monster</div>
+      <div class="hp" role="meter" aria-label="Model Monster health" aria-valuemin="0" aria-valuemax="${B.max}" aria-valuenow="${B.hp}"><span id="hp-fill" style="width:${hp / B.max * 100}%"></span></div>
+      <div class="hearts" aria-label="${B.hearts} of 3 hearts left">${[0, 1, 2].map(i => `<span class="${i < hearts ? '' : 'lost'}" data-heart="${i}" aria-hidden="true">\u2665</span>`).join('')}</div>
+      <p class="boss-msg" role="status">${msg}</p>
+    </div></section>`;
+}
+function animateBoss(ev) {
+  const B = run.boss, mon = $('.boss .monster'), fill = $('#hp-fill');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (fill) fill.style.width = (B.hp / B.max * 100) + '%';
+    if (!mon) return;
+    if (ev.ev === 'hit') mon.classList.add('hit');
+    if (ev.ev === 'defeat') mon.classList.add('hit', 'defeated');
+    if (ev.ev === 'miss' || ev.ev === 'lost') { const h = $(`[data-heart="${B.hearts}"]`); if (h) h.classList.add('lost', 'pop'); mon.classList.add('taunt'); }
+  }));
+}
+
+/* ---------- question parts ---------- */
+function initPart(p) {
+  const st = { sel: null };
+  if (p.kind === 'mc') st.order = shuffle(p.choices.map((_, i) => i));
+  if (p.kind === 'parent') st.order = PKEYS.map((_, i) => i);
+  if (p.kind === 'glitch') { st.fix = null; st.fixOrder = shuffle(p.fixes.map((_, i) => i)); }
+  if (p.kind === 'order') st.seq = [];
+  return st;
+}
+function partHTML(p, pi, st, v) {
+  const lab = p.label ? `<span class="flabel">${rich(p.label)}</span>` : '';
+  switch (p.kind) {
+    case 'parent':
+      return `<div class="choices two" role="group" aria-label="Parent functions">${st.order.map(ci => { const P = PARENTS[PKEYS[ci]]; return `<button type="button" class="choice" data-pi="${pi}" data-ci="${ci}" aria-pressed="false">${math('f(x) = ' + P.math)}<span class="cname">${P.name}</span></button>`; }).join('')}</div>`;
+    case 'mc':
+      return `<div class="choices" role="group" aria-label="Answer choices">${st.order.map(ci => `<button type="button" class="choice" data-pi="${pi}" data-ci="${ci}" aria-pressed="false">${rich(p.choices[ci])}</button>`).join('')}</div>`;
+    case 'glitch':
+      return `<p class="plab" id="gl-${pi}">Tap the statement with the glitch.</p>
+        <div class="choices" role="group" aria-labelledby="gl-${pi}">${p.steps.map((s, ci) => `<button type="button" class="choice stmt" data-pi="${pi}" data-ci="${ci}" aria-pressed="false"><span class="stn" aria-hidden="true">${ci + 1}</span><span>${rich(s)}</span></button>`).join('')}</div>
+        <p class="plab" id="fx-${pi}">Then choose the fix.</p>
+        <div class="choices" role="group" aria-labelledby="fx-${pi}">${st.fixOrder.map(fi => `<button type="button" class="choice" data-pi="${pi}" data-fi="${fi}" aria-pressed="false">${rich(p.fixes[fi])}</button>`).join('')}</div>`;
+    case 'point':
+      return `<div class="field">${lab}<span class="pt"><span class="paren" aria-hidden="true">(</span><input type="text" class="num" data-pi="${pi}" data-k="x" autocomplete="off" autocapitalize="off" aria-label="${esc(plain(p.label || 'Point'))} x-coordinate"><span class="paren" aria-hidden="true">,</span><input type="text" class="num" data-pi="${pi}" data-k="y" autocomplete="off" autocapitalize="off" aria-label="${esc(plain(p.label || 'Point'))} y-coordinate"><span class="paren" aria-hidden="true">)</span></span></div>`;
+    case 'num':
+      return `<div class="field">${lab}${p.prefix ? `<span class="pre" aria-hidden="true">${rich(p.prefix)}</span>` : ''}<input type="text" class="num" data-pi="${pi}" data-k="v" autocomplete="off" autocapitalize="off" aria-label="${esc(plain(p.label + (p.prefix ? ', ' + p.prefix : '')))}">${p.suffix ? `<span class="suf">${esc(p.suffix)}</span>` : ''}</div>`;
+    case 'select':
+      return `<div class="field">${lab}<span class="seg" role="group" aria-label="${esc(plain(p.label))}">${p.options.map((o, ci) => `<button type="button" data-pi="${pi}" data-ci="${ci}" aria-pressed="false">${esc(o)}</button>`).join('')}</span></div>`;
+    case 'eq': {
+      const vv = p.var || 'x';
+      return `<div class="eqblock"><div class="field">${lab}<input type="text" class="eq-in" data-pi="${pi}" data-k="e" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${esc(plain(p.label || 'Equation'))}" aria-describedby="eqhelp-${pi}"></div>
+        <div class="keypad" role="group" aria-label="Insert a symbol">${[['^', '^', 'exponent'], ['sqrt(', '\u221A(', 'square root'], ['|', '|', 'absolute value bar'], ['(', '(', 'open parenthesis'], [')', ')', 'close parenthesis']].map(([ins, lbl, name]) => `<button type="button" data-pi="${pi}" data-ins="${esc(ins)}" aria-label="Insert ${name}">${esc(lbl)}</button>`).join('')}</div>
+        <p class="help" id="eqhelp-${pi}">Type ${vv}^2 for ${vv}\u00B2, sqrt(${vv}) for \u221A${vv}, and |${vv}| or abs(${vv}) for absolute value.</p>
+        <div class="preview" data-preview="${pi}" aria-live="polite"></div></div>`;
+    }
+    case 'order':
+      return `<div class="orderblock"><p class="plab">${rich(p.label)}</p>
+        <ol class="seq" data-seq="${pi}" aria-label="Your order"></ol>
+        <div class="chips" role="group" aria-label="Transformations to choose from">${p.bank.map((b, ci) => `<button type="button" class="chip" data-pi="${pi}" data-ci="${ci}">${esc(b)}</button>`).join('')}</div></div>`;
+    case 'text':
+      return `<div class="fieldblock"><label class="lab" for="txt-${pi}">${rich(p.label)}</label><textarea id="txt-${pi}" data-pi="${pi}" rows="3"></textarea></div>`;
+  }
+  return '';
+}
+function updateOrder(pi) {
+  const p = qs.q.parts[pi], st = qs.parts[pi], ol = $(`[data-seq="${pi}"]`);
+  ol.innerHTML = st.seq.length
+    ? st.seq.map(ci => `<li><button type="button" class="chip on" data-pi="${pi}" data-rm="${ci}" aria-label="Remove ${esc(p.bank[ci])}">${esc(p.bank[ci])}<span aria-hidden="true"> \u00D7</span></button></li>`).join('')
+    : '<li class="empty">Your order shows up here.</li>';
+  $$(`.chips [data-pi="${pi}"]`).forEach(b => { b.disabled = st.seq.includes(+b.dataset.ci); });
+}
+function gradePart(p, st, pi) {
+  const box = app.querySelector(`.part[data-pi="${pi}"]`);
+  const val = k => { const el = box && box.querySelector(`[data-k="${k}"]`); return el ? el.value.trim() : ''; };
+  switch (p.kind) {
+    case 'parent': case 'mc': {
+      if (st.sel == null) return { complete: false };
+      const ok = p.kind === 'parent' ? PKEYS[st.sel] === p.answer : st.sel === p.answer;
+      const txt = p.kind === 'parent' ? '$f(x) = ' + PARENTS[PKEYS[st.sel]].math + '$' : p.choices[st.sel];
+      return { complete: true, ok, html: rich(txt), text: plain(txt) };
+    }
+    case 'glitch': {
+      if (st.sel == null || st.fix == null) return { complete: false, msg: 'Pick the statement with the glitch and a fix.' };
+      return { complete: true, ok: st.sel === p.glitch && st.fix === p.fix, html: `Statement ${st.sel + 1}. Fix: ${rich(p.fixes[st.fix])}`, text: `Statement ${st.sel + 1}; ${plain(p.fixes[st.fix])}` };
+    }
+    case 'point': {
+      const xs = val('x'), ys = val('y');
+      if (!xs || !ys) return { complete: false, msg: 'Enter both coordinates.' };
+      const x = parseNum(xs), y = parseNum(ys);
+      if (Number.isNaN(x) || Number.isNaN(y)) return { complete: false, msg: 'Type one number in each box, like -6 or 1/2.' };
+      return { complete: true, ok: near(x, p.x) && near(y, p.y), html: math(`(${normalizeInput(xs)}, ${normalizeInput(ys)})`), text: `(${xs}, ${ys})` };
+    }
+    case 'num': {
+      const s = val('v'); if (!s) return { complete: false };
+      const v = parseNum(s);
+      if (Number.isNaN(v)) return { complete: false, msg: 'Type a number, like 3 or -1/2.' };
+      return { complete: true, ok: near(v, p.answer), html: esc(s), text: s };
+    }
+    case 'select':
+      if (st.sel == null) return { complete: false };
+      return { complete: true, ok: st.sel === p.answer, html: esc(p.options[st.sel]), text: p.options[st.sel] };
+    case 'eq': {
+      const s = val('e'); if (!s) return { complete: false };
+      const vv = p.var || 'x'; let f;
+      try { f = compile(normalizeInput(s, true), vv); } catch (e) {
+        return { complete: false, msg: `That equation could not be read. Check the parentheses and use ${vv} as the variable, for example 2(${vv}+3)^2-1.` };
+      }
+      const ft = compile(normalizeInput(p.answer, true), vv);
+      return { complete: true, ok: sameFn(f, ft), html: math(normalizeInput(s, true)), text: s };
+    }
+    case 'order': {
+      if (!st.seq.length) return { complete: false, msg: 'Tap the transformations in order.' };
+      const set = new Set(st.seq), ans = new Set(p.answer);
+      let ok = set.size === ans.size && [...ans].every(a => set.has(a));
+      if (ok) for (const [a, b] of (p.before || [])) if (st.seq.indexOf(a) > st.seq.indexOf(b)) ok = false;
+      const t = st.seq.map(c => p.bank[c]).join(', ');
+      return { complete: true, ok, html: esc(t), text: t };
+    }
+    case 'text': {
+      const el = box && box.querySelector('textarea'); const s = el ? el.value.trim() : '';
+      if (!s) return { complete: false, msg: 'Write your explanation first.' };
+      return { complete: true, ok: null, html: esc(s), text: s, words: s.split(/\s+/).length };
+    }
+  }
+  return { complete: false };
+}
+
+/* ---------- question screen ---------- */
+function toolsHTML(q) {
+  if (run.L.final) return '<p class="muted tools-note">Final Checkpoint: no timer, no hints and no power-ups. Show what you know.</p>';
+  const P = S.powerups, hasChoices = q.parts.some(p => ['mc', 'parent', 'glitch'].includes(p.kind));
+  return `<div class="tools" role="group" aria-label="Hint and power-ups">
+    <button type="button" class="btn small" id="t-hint">Hint <span class="cost">\u221225 XP</span></button>
+    <button type="button" class="btn small pu" id="t-peek" title="${esc(POWERUPS.peek.desc)}" ${!P.peek || !q.fx ? 'disabled' : ''}>Graph Peek <b>${P.peek}</b></button>
+    <button type="button" class="btn small pu" id="t-fifty" title="${esc(POWERUPS.fifty.desc)}" ${!P.fifty || !hasChoices ? 'disabled' : ''}>50/50 <b>${P.fifty}</b></button>
+    <button type="button" class="btn small pu" id="t-freeze" title="${esc(POWERUPS.freeze.desc)}" ${!P.freeze || !qs.limit ? 'disabled' : ''}>Time Freeze <b>${P.freeze}</b></button>
+  </div>`;
+}
+function renderQuestion(q) {
+  const L = run.L, limit = timeLimit(q);
+  qs = { q, parts: q.parts.map(initPart), hint: false, fifty: false, peeked: false, froze: false, limit, left: limit, done: false };
+  show(`${runbar()}<main class="wrap stack" id="qmain">
+    ${run.boss ? bossPanel(null) : ''}
+    ${limit ? `<div class="timerwrap"><div class="timer" id="timer"><span id="timer-bar"></span></div><span class="timer-text" id="timer-text" role="timer">${limit} s</span></div>` : ''}
+    <section class="sheet stack qsheet">
+      <h2 class="prompt" data-focus tabindex="-1">${rich(q.prompt)}</h2>
+      ${q.graph ? `<figure class="qgraph"><div class="graph" id="q-graph" role="img" aria-label="${esc(plain(q.graphDesc))}"></div><figcaption class="help">${rich(q.graphDesc)}</figcaption></figure>` : ''}
+      ${q.parts.map((p, i) => `<div class="part part-${p.kind}" data-pi="${i}">${partHTML(p, i, qs.parts[i])}</div>`).join('')}
+      ${L.reason ? `<div class="fieldblock reason"><label class="lab" for="reason">In one sentence, what does your answer mean in this situation? <span class="muted">(optional, +25 XP)</span></label><textarea id="reason" rows="2" placeholder="Example: C(x) + 50 means every cost is 50 dollars higher."></textarea></div>` : ''}
+      <div class="hintbox" id="hintbox" hidden></div>
+      <p class="err" id="q-err" role="alert"></p>
+    </section>
+    ${toolsHTML(q)}
+    <button type="button" class="btn primary big" id="submit">Check answer</button>
+  </main>`, () => {
+    bindQuit();
+    if (q.graph) {
+      const plot = mkPlot($('#q-graph'), q.graph.view || { xmin: -6, xmax: 6, ymin: -4, ymax: 6 });
+      plot.paint = p => { p.curve(q.graph.parent, { sx: 1, h: 0, sy: 1, k: 0 }, { color: cssVar('--blue'), width: 3.5, endpoint: true, asym: true }); (q.graph.points || []).forEach(([x, y]) => p.dot(x, y, cssVar('--orange'))); };
+      plot.render();
+    }
+    q.parts.forEach((p, i) => { if (p.kind === 'order') updateOrder(i); });
+    const main = $('#qmain');
+    main.addEventListener('click', e => {
+      const b = e.target.closest('button[data-pi]'); if (!b || b.disabled) return;
+      const pi = +b.dataset.pi, p = q.parts[pi], st = qs.parts[pi];
+      if (b.dataset.ins != null) {
+        const inp = $(`.part[data-pi="${pi}"] .eq-in`); const s = inp.selectionStart == null ? inp.value.length : inp.selectionStart, en = inp.selectionEnd == null ? s : inp.selectionEnd;
+        inp.value = inp.value.slice(0, s) + b.dataset.ins + inp.value.slice(en); inp.focus();
+        const c = s + b.dataset.ins.length; try { inp.setSelectionRange(c, c); } catch (err) { /* ignore */ }
+        inp.dispatchEvent(new Event('input', { bubbles: true })); return;
+      }
+      if (p.kind === 'order') {
+        if (b.dataset.rm != null) st.seq = st.seq.filter(c => c !== +b.dataset.rm);
+        else if (!st.seq.includes(+b.dataset.ci)) st.seq.push(+b.dataset.ci);
+        updateOrder(pi); return;
+      }
+      const grp = b.closest('[role="group"]');
+      if (b.dataset.fi != null) st.fix = +b.dataset.fi; else st.sel = +b.dataset.ci;
+      $$('button', grp).forEach(x => x.setAttribute('aria-pressed', x === b));
+      $('#q-err').textContent = '';
+    });
+    main.addEventListener('input', e => {
+      const inp = e.target; if (!inp.classList || !inp.classList.contains('eq-in')) return;
+      const pi = inp.dataset.pi, pv = $(`[data-preview="${pi}"]`), p = q.parts[pi], s = inp.value.trim();
+      if (!s) { pv.innerHTML = ''; return; }
+      try { compile(normalizeInput(s, true), p.var || 'x'); pv.innerHTML = 'Reads as ' + math(normalizeInput(s, true)); pv.classList.remove('bad'); }
+      catch (err) { pv.textContent = 'Keep typing. This is not a complete expression yet.'; pv.classList.add('bad'); }
+    });
+    main.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); submitQuestion(false); } });
+    $('#submit').addEventListener('click', () => submitQuestion(false));
+    if (!L.final) {
+      $('#t-hint').addEventListener('click', e => {
+        if (qs.hint) return; qs.hint = true;
+        const box = $('#hintbox'); box.hidden = false; box.innerHTML = '<strong>Hint:</strong> ' + rich(q.hint || 'Think about what is inside the function and what is outside.');
+        e.currentTarget.disabled = true; e.currentTarget.innerHTML = 'Hint used';
+      });
+      $('#t-peek').addEventListener('click', () => { if (!S.powerups.peek || !q.fx || qs.peeked) return; S.powerups.peek--; qs.peeked = true; save(); refreshTools(); openPeek(q.fx); });
+      $('#t-fifty').addEventListener('click', () => { if (!S.powerups.fifty || qs.fifty) return; useFifty(q); });
+      $('#t-freeze').addEventListener('click', () => {
+        if (!S.powerups.freeze || !qs.limit || qs.froze) return;
+        S.powerups.freeze--; qs.froze = true; qs.left += 15; save(); updateTimer(); refreshTools(); toast('Time Freeze: +15 seconds');
+      });
+    }
+    startTimer();
+  });
+}
+function refreshTools() {
+  const P = S.powerups, q = qs.q;
+  const set = (id, n, ok) => { const b = $('#' + id); if (!b) return; b.querySelector('b').textContent = n; b.disabled = !n || !ok; };
+  set('t-peek', P.peek, !!q.fx && !qs.peeked);
+  set('t-fifty', P.fifty, q.parts.some(p => ['mc', 'parent', 'glitch'].includes(p.kind)) && !qs.fifty);
+  set('t-freeze', P.freeze, !!qs.limit && !qs.froze);
+}
+function useFifty(q) {
+  const pi = q.parts.findIndex(p => ['mc', 'parent', 'glitch'].includes(p.kind)); if (pi < 0) return;
+  S.powerups.fifty--; qs.fifty = true; save(); refreshTools();
+  const p = q.parts[pi], st = qs.parts[pi];
+  const kill = sel => { const b = $(`.part[data-pi="${pi}"] ${sel}`); if (!b) return; b.disabled = true; b.classList.add('gone'); b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Removed choice'); };
+  if (p.kind === 'glitch') {
+    const ws = shuffle(p.steps.map((_, i) => i).filter(i => i !== p.glitch))[0];
+    const wf = shuffle(p.fixes.map((_, i) => i).filter(i => i !== p.fix))[0];
+    kill(`[data-ci="${ws}"]`); kill(`[data-fi="${wf}"]`);
+    if (st.sel === ws) st.sel = null; if (st.fix === wf) st.fix = null;
+  } else {
+    const correct = p.kind === 'parent' ? PKEYS.indexOf(p.answer) : p.answer;
+    shuffle(st.order.filter(i => i !== correct)).slice(0, 2).forEach(i => { kill(`[data-ci="${i}"]`); if (st.sel === i) st.sel = null; });
+  }
+  toast('50/50: two wrong choices removed');
+}
+function openPeek(fx) {
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  ov.innerHTML = `<div class="sheet stack peek" role="dialog" aria-modal="true" aria-labelledby="peek-h"><h2 id="peek-h">Graph Peek</h2>
+    <div class="graph" id="peek-graph" role="img" aria-label="${esc('Graph of g(x) = ' + plain(formatTransformed(fx.parent, fx)))}"></div>
+    <p class="muted" id="peek-count">Closing in 3 seconds</p><button type="button" class="btn" id="peek-close">Close</button></div>`;
+  document.body.appendChild(ov);
+  const plot = new Plot($('#peek-graph', ov), fx.view);
+  plot.paint = p => { p.curve(fx.parent, { sx: 1, h: 0, sy: 1, k: 0 }, { color: cssVar('--curve-parent'), dash: [6, 6], width: 2 }); p.curve(fx.parent, paramsToT(fx), { color: cssVar('--blue'), width: 3.5, endpoint: true, asym: true }); };
+  plot.render();
+  let n = 3; const back = document.activeElement;
+  const close = () => { clearInterval(iv); plot.destroy(); ov.remove(); if (back && back.isConnected) try { back.focus(); } catch (e) { /* ignore */ } };
+  const iv = setInterval(() => { n--; const c = $('#peek-count', ov); if (n <= 0) close(); else if (c) c.textContent = `Closing in ${n} second${n === 1 ? '' : 's'}`; }, 1000);
+  $('#peek-close', ov).addEventListener('click', close); $('#peek-close', ov).focus();
+  cleanups.push(() => { if (ov.isConnected) close(); });
+}
+
+/* ---------- timer ---------- */
+function startTimer() {
+  if (!qs || !qs.limit) return;
+  let last = performance.now(); updateTimer();
+  timerId = setInterval(() => {
+    const now = performance.now(); qs.left -= (now - last) / 1000; last = now;
+    if (qs.left <= 0) { qs.left = 0; updateTimer(); submitQuestion(true); return; }
+    updateTimer();
+  }, 100);
+}
+function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+function updateTimer() {
+  const bar = $('#timer-bar'), txt = $('#timer-text'), t = $('#timer'); if (!bar) return;
+  const f = Math.max(0, Math.min(1, qs.left / qs.limit));
+  bar.style.width = (f * 100) + '%';
+  const secs = Math.ceil(qs.left); txt.textContent = secs + ' s';
+  t.classList.toggle('warn', qs.left <= 10 && qs.left > 5); t.classList.toggle('crit', qs.left <= 5);
+}
+
+/* ---------- scoring ---------- */
+function multiplier() { return session.streak >= 5 ? 2 : session.streak >= 3 ? 1.5 : 1; }
+function afterAnswer(q, ok, hintUsed) {
+  const L = run.L;
+  if (hintUsed) run.hintsUsed++;
+  if (session.streak > S.bestStreak) S.bestStreak = session.streak;
+  if (ok && !L.final) {
+    if (session.streak === 3) { S.powerups.peek++; toast('Power-up earned: Graph Peek'); }
+    if (session.streak === 5) { S.powerups.fifty++; toast('Power-up earned: 50/50'); }
+  }
+  if (session.streak >= 5) award('fire');
+  if (ok && q.tag === 'reflection-axis' && !S.reflectOk.includes(q.id)) { S.reflectOk.push(q.id); if (REFLECT_IDS.every(id => S.reflectOk.includes(id))) award('mirror'); }
+  if (ok && L.id === '1') { run.glitch++; if (run.glitch >= 3) award('glitch'); }
+  if (ok && L.id === '2') { run.shift++; if (run.shift >= 8) award('shooter'); }
+  if (!L.final && !run.freezeGiven && run.hintsUsed === 0 && run.answered >= 3) { run.freezeGiven = true; S.powerups.freeze++; toast('Power-up earned: Time Freeze'); }
+}
+function bossHit(ok) {
+  const B = run.boss, ev = { prevHp: B.hp, prevHearts: B.hearts };
+  if (ok) {
+    if (B.defeated) ev.ev = 'bonus';
+    else { B.hp--; if (B.hp <= 0) { B.hp = 0; B.defeated = true; ev.ev = 'defeat'; award('boss'); } else ev.ev = 'hit'; }
+  } else if (B.defeated) ev.ev = 'flat';
+  else { B.hearts--; if (B.hearts <= 0) { B.hearts = 0; B.lost = true; ev.ev = 'lost'; } else ev.ev = 'miss'; }
+  return ev;
+}
+function submitQuestion(timedOut) {
+  if (!qs || qs.done) return;
+  const q = qs.q, L = run.L;
+  const grades = q.parts.map((p, i) => gradePart(p, qs.parts[i], i));
+  if (!timedOut) {
+    const bad = grades.find(g => !g.complete);
+    if (bad) { $('#q-err').textContent = bad.msg || 'Answer every part before checking.'; return; }
+  }
+  qs.done = true; stopTimer();
+  const textOnly = !isGradable(q);
+  const ok = !textOnly && grades.every(g => g.complete && g.ok);
+  const fb = { q, ok, timedOut: !!timedOut && !ok, textOnly, xp: 0, bd: [],
+    given: grades.map(g => (g.complete ? g.html : '<em>No answer</em>')).join('<br>'),
+    givenText: grades.map(g => (g.complete ? g.text : '(no answer)')).join('; ') };
+  let gained = 0;
+  if (!textOnly) {
+    run.answered++;
+    if (ok) {
+      session.streak++; run.correct++;
+      const base = L.points || 100;
+      const speed = qs.limit ? Math.min(50, Math.round(50 * Math.max(0, qs.left) / qs.limit)) : 0;
+      const hint = qs.hint ? 25 : 0, mult = multiplier();
+      gained = Math.max(0, Math.round((base + speed - hint) * mult));
+      fb.bd.push(base + ' correct'); if (speed) fb.bd.push('+' + speed + ' speed'); if (hint) fb.bd.push('\u2212' + hint + ' hint'); if (mult > 1) fb.bd.push('\u00D7' + mult + ' streak');
+    } else session.streak = 0;
+  }
+  const reasonEl = $('#reason'), reason = reasonEl ? reasonEl.value.trim() : '';
+  const tg = grades.find(g => g.words);
+  if ((reason && reason.split(/\s+/).length >= 6) || (tg && tg.words >= 6)) {
+    gained += 25; fb.bd.push('+25 explanation'); S.explainCount++; if (S.explainCount >= 3) award('explainer');
+  }
+  fb.xp = gained; run.xp += gained;
+  if (!textOnly) afterAnswer(q, ok, qs.hint);
+  if (L.final) run.exit[q.id] = { answer: fb.givenText, correct: textOnly ? null : ok };
+  if (run.boss && !textOnly) fb.boss = bossHit(ok);
+  save();
+  renderFeedback(fb);
+}
+
+/* ---------- feedback ---------- */
+function animBlock(fx) {
+  const steps = transformSteps(fx);
+  return `<figure class="anim stack">
+    <div class="graph" id="fb-graph" role="img" aria-label="${esc('Graph showing y = ' + plain(PARENTS[fx.parent].math) + ' transformed into g(x) = ' + plain(formatTransformed(fx.parent, fx)) + '. Steps: ' + (steps.map(s => s.label).join(', ') || 'none'))}"></div>
+    <div class="legend" aria-hidden="true"><span><i class="sw dash"></i>Parent ${math('y = ' + PARENTS[fx.parent].math)}</span><span><i class="sw blue"></i>${math('g(x) = ' + formatTransformed(fx.parent, fx))}</span>${fx.pt ? '<span><i class="dotkey"></i>Point moving</span>' : ''}</div>
+    ${fx.note ? `<p class="help">${rich(fx.note)}</p>` : ''}
+    ${steps.length ? `<ol class="steps" id="fb-steps">${steps.map(s => `<li>${esc(s.label)}</li>`).join('')}</ol>` : ''}
+    <button type="button" class="btn small" id="replay">Replay animation</button>
+  </figure>`;
+}
+function startAnim(fx) {
+  const plot = mkPlot($('#fb-graph'), fx.view), pk = fx.parent, steps = transformSteps(fx), P0 = { sx: 1, h: 0, sy: 1, k: 0 };
+  let T = P0; const lis = $$('#fb-steps li');
+  plot.paint = p => {
+    p.curve(pk, P0, { color: cssVar('--curve-parent'), dash: [6, 6], width: 2 });
+    p.curve(pk, T, { color: cssVar('--blue'), width: 3.5, endpoint: true, asym: true });
+    if (fx.pt) { p.dot(fx.pt[0], fx.pt[1], cssVar('--curve-parent'), true); const m = mapPt(fx.pt, T); p.dot(m[0], m[1], cssVar('--orange')); }
+  };
+  let raf = null, timeout = null, token = 0;
+  const finish = () => { T = steps.length ? steps[steps.length - 1].to : P0; lis.forEach(li => { li.classList.remove('active'); li.classList.add('done'); }); plot.render(); };
+  const play = () => {
+    token++; const my = token; if (raf) cancelAnimationFrame(raf); clearTimeout(timeout);
+    if (reduceMotion || !steps.length) { finish(); return; }
+    T = P0; lis.forEach(li => li.classList.remove('active', 'done')); plot.render();
+    let si = 0, t0 = null; const DUR = 850, HOLD = 450;
+    const frame = ts => {
+      if (my !== token || !plot.c.isConnected) return;
+      if (t0 === null) { t0 = ts; lis.forEach((li, i) => li.classList.toggle('active', i === si)); }
+      const e = Math.min(1, (ts - t0) / DUR);
+      T = lerpT(steps[si].from, steps[si].to, ease(e)); plot.render();
+      if (ts - t0 >= DUR + HOLD) { if (lis[si]) { lis[si].classList.remove('active'); lis[si].classList.add('done'); } si++; t0 = null; if (si >= steps.length) return; }
+      raf = requestAnimationFrame(frame);
+    };
+    timeout = setTimeout(() => { raf = requestAnimationFrame(frame); }, 450);
+  };
+  play();
+  $('#replay').addEventListener('click', play);
+  cleanups.push(() => { token++; if (raf) cancelAnimationFrame(raf); clearTimeout(timeout); });
+}
+function renderFeedback(fb) {
+  const q = fb.q, L = run.L;
+  const last = run.idx >= L.items.length - 1 || (run.boss && run.boss.lost);
+  let cls, icon, title;
+  if (fb.textOnly) { cls = 'neutral'; icon = '\u270E'; title = 'Saved for your SI leader'; }
+  else if (fb.gb) { cls = 'ok'; icon = '\u2713'; title = `Matched in ${fb.gb.moves} move${fb.gb.moves === 1 ? '' : 's'}`; }
+  else if (fb.ok) { cls = 'ok'; icon = '\u2713'; title = 'Correct'; }
+  else if (fb.timedOut) { cls = 'no'; icon = '\u23F1'; title = "Time's up"; }
+  else if (fb.skipped) { cls = 'no'; icon = '\u21B7'; title = 'Round skipped'; }
+  else { cls = 'no'; icon = '\u2715'; title = 'Not quite'; }
+  show(`${runbar()}<main class="wrap stack">
+    ${run.boss && fb.boss ? bossPanel(fb.boss) : ''}
+    <section class="sheet stack fb">
+      <div class="verdict ${cls}" data-focus tabindex="-1"><span class="vicon" aria-hidden="true">${icon}</span><span class="vtitle">${title}</span>${fb.xp ? `<span class="xpgain">+${fmtXP(fb.xp)} XP</span>` : ''}</div>
+      ${fb.gb ? `<p class="bigstars" aria-label="${fb.gb.stars} of 3 stars">${starStr(fb.gb.stars)}</p>` : ''}
+      ${fb.bd.length ? `<p class="bd">${fb.bd.join(' ')}</p>` : ''}
+      ${!fb.ok && fb.given ? `<div class="ans"><span class="anslab">Your answer</span><div>${fb.given}</div></div>` : ''}
+      <div class="ans"><span class="anslab">${fb.textOnly ? 'Sample answer' : 'Answer'}</span><div>${rich(q.answerText)}</div></div>
+      <p>${rich(q.explanation)}</p>
+      ${q.fx ? animBlock(q.fx) : ''}
+    </section>
+    <button type="button" class="btn primary big" id="next">${last ? 'Finish level' : 'Next question'}</button>
+  </main>`, () => {
+    bindQuit();
+    if (q.fx) startAnim(q.fx);
+    if (run.boss && fb.boss) animateBoss(fb.boss);
+    $('#next').addEventListener('click', () => { run.idx++; renderItem(); });
+  });
+}
+
+/* ---------- graph builder ---------- */
+const CTL = {
+  a: { min: -4, max: 4, step: 0.5, def: 1, help: 'Vertical stretch or compression. Negative flips across the x-axis.' },
+  b: { min: -4, max: 4, step: 0.5, def: 1, help: 'Horizontal stretch or compression. Negative flips across the y-axis.' },
+  h: { min: -8, max: 8, step: 1, def: 0, help: 'Horizontal shift. Positive moves right.' },
+  k: { min: -8, max: 8, step: 1, def: 0, help: 'Vertical shift. Positive moves up.' }
+};
+function ctlHTML(n) {
+  const c = CTL[n];
+  return `<div class="ctl"><div class="ctl-top"><label for="r-${n}" class="ctl-name">${math(n)}</label><span class="ctl-help" id="h-${n}">${c.help}</span></div>
+    <div class="ctl-in"><input type="range" id="r-${n}" data-p="${n}" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.def}" aria-describedby="h-${n}">
+    <input type="number" class="numbox" id="n-${n}" data-p="${n}" step="any" value="${c.def}" aria-label="${n} value"></div></div>`;
+}
+function renderGB(q) {
+  gb = { q, v: { a: 1, b: 1, h: 0, k: 0 }, moves: 0, lastP: null, lastT: 0, hints: 0, said: [] };
+  qs = null;
+  show(`${runbar()}<main class="wrap stack">
+    <section class="sheet stack">
+      <h2 class="prompt" data-focus tabindex="-1">Graph Builder: match the target</h2>
+      <p>${rich(q.prompt)}</p>
+      <p class="muted">Set ${math('a')}, ${math('b')}, ${math('h')} and ${math('k')} in ${math('g(x) = a*f(b(x - h)) + k')} so your curve sits exactly on the target. Fewer moves earn more stars.</p>
+      <div class="gbstick">
+        <div class="graph gbgraph" id="gb-graph" role="img"></div>
+        <div class="legend" aria-hidden="true"><span><i class="sw dash"></i>Parent</span><span><i class="sw target"></i>Target</span><span><i class="sw blue"></i>Your graph</span></div>
+        <p class="gb-eq">Your graph: <span id="gb-eq"></span></p>
+      </div>
+      <div class="ctls">${['a', 'b', 'h', 'k'].map(ctlHTML).join('')}</div>
+      <p class="gb-status" id="gb-moves" aria-live="polite"></p>
+      <div class="hintbox" id="hintbox" hidden></div>
+      <p class="err" id="q-err" role="alert"></p>
+    </section>
+    <div class="tools" role="group" aria-label="Graph Builder tools">
+      <button type="button" class="btn small" id="gb-hint">Hint <span class="cost">\u221225 XP</span></button>
+      <button type="button" class="btn small" id="gb-reset">Reset sliders</button>
+      <button type="button" class="btn small" id="gb-skip">Skip round</button>
+    </div>
+    <button type="button" class="btn primary big" id="gb-check">Check match</button>
+  </main>`, () => {
+    bindQuit();
+    const pk = q.parent;
+    const plot = mkPlot($('#gb-graph'), q.fx.view);
+    const targetT = paramsToT(q.target), P0 = { sx: 1, h: 0, sy: 1, k: 0 };
+    plot.paint = p => {
+      p.curve(pk, P0, { color: cssVar('--curve-parent'), dash: [6, 6], width: 2 });
+      p.curve(pk, targetT, { color: cssVar('--orange'), width: 10, alpha: 0.45, endpoint: true });
+      p.curve(pk, paramsToT(gb.v), { color: cssVar('--blue'), width: 3, endpoint: true, asym: true });
+    };
+    const update = () => {
+      const f = formatTransformed(pk, gb.v);
+      $('#gb-eq').innerHTML = math('g(x) = ' + f);
+      $('#gb-graph').setAttribute('aria-label', 'Target: ' + plain(q.prompt.replace(/^Parent[^.]*\.\s*Target:\s*/, '')) + ' Your graph: g(x) = ' + plain(f) + '.');
+      const m = gb.moves, stars = m <= q.min ? 3 : m <= q.min + 2 ? 2 : 1;
+      $('#gb-moves').innerHTML = `Moves: <b>${m}</b>. Fewest possible: ${q.min}. <span class="stars">${starStr(stars)}</span> <span class="sr">${stars} stars</span> if you match now.`;
+      plot.render();
+    };
+    const onChange = el => {
+      const n = el.dataset.p, v = parseFloat(el.value);
+      if (!Number.isFinite(v)) return;
+      gb.v[n] = v;
+      if (el.type === 'range') $('#n-' + n).value = v; else $('#r-' + n).value = v;
+      const now = performance.now();
+      if (gb.lastP !== n || now - gb.lastT > 1500) gb.moves++;
+      gb.lastP = n; gb.lastT = now;
+      $('#q-err').textContent = '';
+      update();
+    };
+    $$('.ctl input').forEach(el => el.addEventListener('input', () => onChange(el)));
+    $$('.numbox').forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); check(); } }));
+    $('#gb-reset').addEventListener('click', () => {
+      ['a', 'b', 'h', 'k'].forEach(n => { gb.v[n] = CTL[n].def; $('#r-' + n).value = CTL[n].def; $('#n-' + n).value = CTL[n].def; });
+      gb.lastP = null; update();
+    });
+    $('#gb-hint').addEventListener('click', () => {
+      const n = ['h', 'k', 'a', 'b'].find(x => Math.abs(gb.v[x] - q.target[x]) > 1e-9 && !gb.said.includes(x));
+      const box = $('#hintbox'); box.hidden = false;
+      if (!n) { box.innerHTML += (box.innerHTML ? '<br>' : '') + 'Your settings already use the target values you have been given. Press Check match.'; return; }
+      gb.hints++; gb.said.push(n);
+      const why = { h: 'to move the graph sideways', k: 'to move it up or down', a: 'for the vertical stretch or flip', b: 'for the horizontal stretch or flip' }[n];
+      box.innerHTML += (box.innerHTML ? '<br>' : '<strong>Hints:</strong> ') + `Set ${math(n)} to ${math(fmtN(q.target[n]))} ${why}.`;
+    });
+    const finish = (ok, skipped) => {
+      const fb = { q, ok, textOnly: false, xp: 0, bd: [], skipped };
+      run.answered++;
+      if (ok) {
+        session.streak++; run.correct++;
+        const stars = gb.moves <= q.min ? 3 : gb.moves <= q.min + 2 ? 2 : 1;
+        const base = [0, 50, 100, 150][stars], hint = gb.hints * 25, mult = multiplier();
+        fb.xp = Math.max(0, Math.round((base - hint) * mult));
+        fb.gb = { stars, moves: gb.moves };
+        fb.bd.push(base + ' for ' + stars + ' star' + (stars === 1 ? '' : 's')); if (hint) fb.bd.push('\u2212' + hint + ' hints'); if (mult > 1) fb.bd.push('\u00D7' + mult + ' streak');
+        if (stars === 3 && !S.threeStars.includes(q.id)) { S.threeStars.push(q.id); if (S.threeStars.length >= 3) award('stretch'); }
+      } else {
+        session.streak = 0;
+        fb.given = math('g(x) = ' + formatTransformed(pk, gb.v));
+      }
+      run.xp += fb.xp;
+      afterAnswer(q, ok, gb.hints > 0);
+      if (run.boss) fb.boss = bossHit(ok);
+      save(); renderFeedback(fb);
+    };
+    const check = () => {
+      if (sameFn(transformedFn(pk, gb.v), transformedFn(pk, q.target))) finish(true, false);
+      else $('#q-err').textContent = 'Not a match yet. Compare the vertex or starting point first, then the direction and steepness.';
+    };
+    $('#gb-check').addEventListener('click', check);
+    const skip = $('#gb-skip');
+    skip.addEventListener('click', () => {
+      if (skip.dataset.armed) { finish(false, true); return; }
+      skip.dataset.armed = '1'; skip.textContent = 'Tap again to skip';
+      setTimeout(() => { if (skip.isConnected) { delete skip.dataset.armed; skip.textContent = 'Skip round'; } }, 3000);
+    });
+    update();
+  });
+}
+
+/* ---------- end of level ---------- */
+function endLevel() {
+  const L = run.L;
+  const gradable = L.items.filter(id => isGradable(Q[id])).length;
+  const acc = gradable ? run.correct / gradable : 1;
+  const prev = S.levels[L.id];
+  const isNewBest = !prev || run.xp > prev.bestXP;
+  if (prev && run.xp > prev.bestXP) award('comeback');
+  S.levels[L.id] = { bestXP: Math.max(prev ? prev.bestXP : 0, run.xp), bestAcc: Math.max(prev ? prev.bestAcc : 0, acc), plays: (prev ? prev.plays : 0) + 1, lastXP: run.xp, lastAcc: acc };
+  if (L.final) S.exit = { when: new Date().toISOString(), answers: run.exit };
+  save();
+  if (L.final) renderFinale(); else renderLevelDone(acc, isNewBest, gradable);
+}
+function badgeChips(ids) { return `<div class="badgechips">${ids.map(id => `<span class="bchip"><span aria-hidden="true">${BADGE[id].icon}</span> ${BADGE[id].name}</span>`).join('')}</div>`; }
+function renderLevelDone(acc, isNewBest, gradable) {
+  const L = run.L, i = LEVELS.indexOf(L), next = LEVELS[i + 1], st = starsFor(acc), nextUn = next && isUnlocked(i + 1), B = run.boss;
+  const title = B ? (B.defeated ? 'Model Monster defeated' : 'The Model Monster wins this round') : L.name + ' complete';
+  const r = run;
+  show(`${topbar('')}<main class="wrap stack">
+    <section class="sheet stack done-card">
+      ${B ? MONSTER(B.defeated ? 'down' : '') : ''}
+      <h2 data-focus tabindex="-1">${esc(title)}</h2>
+      <p class="bigstars" aria-label="${st} of 3 stars">${starStr(st)}</p>
+      <dl class="stats">
+        <div><dt>Accuracy</dt><dd>${pct(acc)} <small>${r.correct} of ${gradable}</small></dd></div>
+        <div><dt>XP this run</dt><dd>${fmtXP(r.xp)}${isNewBest ? ' <small class="newbest">New best</small>' : ''}</dd></div>
+        <div><dt>Total XP</dt><dd>${fmtXP(totalXP())}</dd></div>
+      </dl>
+      ${r.newBadges.length ? `<div><h3>Badges earned</h3>${badgeChips(r.newBadges)}</div>` : ''}
+      <p>${next ? (nextUn ? `${esc(next.name)} is unlocked.` : `Reach 70% on this level to unlock ${esc(next.name)}. Replay as often as you like: your best run counts.`) : ''}</p>
+    </section>
+    <div class="actions">
+      ${nextUn ? `<button type="button" class="btn primary big" id="d-next">Play ${esc(next.name)}</button>` : ''}
+      <button type="button" class="btn" id="d-replay">Replay this level</button>
+      <button type="button" class="btn" data-nav="map">Back to map</button>
+    </div>
+  </main>`, () => {
+    if (nextUn) $('#d-next').addEventListener('click', () => startLevel(next.id));
+    $('#d-replay').addEventListener('click', () => startLevel(L.id));
+  });
+  run = null;
+}
+
+/* ---------- results, progress, finale, settings ---------- */
+function resultsText() {
+  const p = S.profile, xp = totalXP(), R = rankInfo(xp), lines = [];
+  lines.push('Transformation Quest results');
+  lines.push(`Player: ${p.nick} (${teamOf(p.team).name})`);
+  lines.push(`Total XP: ${fmtXP(xp)} (${R.name})`);
+  lines.push(`Longest streak: ${S.bestStreak}`);
+  LEVELS.forEach(L => { const r = S.levels[L.id]; lines.push(`${L.num == null ? '' : 'Level ' + L.num + ' '}${L.name}: ${r ? `best accuracy ${pct(r.bestAcc)}, best XP ${fmtXP(r.bestXP)}` : 'not played'}`); });
+  lines.push('Badges: ' + (S.badges.length ? S.badges.map(id => BADGE[id].name).join(', ') : 'none yet'));
+  if (S.exit) {
+    lines.push('Exit ticket:');
+    ['FC1', 'FC2', 'FC3'].forEach(id => { const a = S.exit.answers[id]; if (a) lines.push(`${id}: ${a.answer}${a.correct === true ? ' (correct)' : a.correct === false ? ' (incorrect)' : ''}`); });
+  } else lines.push('Exit ticket: not completed yet');
+  return lines.join('\n');
+}
+function shareBlock() {
+  return `<section class="sheet stack"><h2>Share your results</h2>
+    <p>Copy this summary and send it to your SI leader, or paste it wherever they ask.</p>
+    <textarea readonly id="res" rows="9" aria-label="Results summary">${esc(resultsText())}</textarea>
+    <div><button type="button" class="btn primary" id="copy">Copy results</button></div></section>`;
+}
+function bindShare() {
+  const b = $('#copy'); if (!b) return;
+  b.addEventListener('click', async () => {
+    const ta = $('#res'), t = ta.value;
+    try { await navigator.clipboard.writeText(t); toast('Results copied'); return; } catch (e) { /* fall through */ }
+    try { ta.focus(); ta.select(); if (document.execCommand('copy')) { toast('Results copied'); return; } } catch (e) { /* fall through */ }
+    ta.focus(); ta.select(); toast('Select the text in the box and copy it');
+  });
+}
+function renderFinale() {
+  const p = S.profile, xp = totalXP(), R = rankInfo(xp), a = S.exit ? S.exit.answers : {};
+  const right = ['FC1', 'FC2'].filter(id => a[id] && a[id].correct).length;
+  run = null;
+  show(`${topbar('')}<main class="wrap stack">
+    <section class="sheet stack finale">
+      <h2 data-focus tabindex="-1">Quest complete</h2>
+      <div class="scorecard">
+        <span class="avatar big" aria-hidden="true">${p.avatar}</span>
+        <div><div class="sc-nick">${esc(p.nick)}</div><span class="team-tag" style="--tc:var(--t-${p.team})">${teamOf(p.team).name}</span></div>
+      </div>
+      <dl class="stats">
+        <div><dt>Total XP</dt><dd>${fmtXP(xp)}</dd></div>
+        <div><dt>Rank</dt><dd>${R.name}</dd></div>
+        <div><dt>Longest streak</dt><dd>${S.bestStreak}</dd></div>
+        <div><dt>Exit ticket</dt><dd>${right} of 2 <small>plus your explanation</small></dd></div>
+      </dl>
+      <div><h3>Badges</h3>${S.badges.length ? badgeChips(S.badges) : '<p class="muted">No badges yet. Replay a level to chase one.</p>'}</div>
+    </section>
+    ${shareBlock()}
+    <div class="actions"><button type="button" class="btn" data-nav="map">Back to map</button><button type="button" class="btn" data-nav="profile">See all progress</button></div>
+  </main>`, bindShare);
+}
+function renderProfile() {
+  if (!S.profile) return renderJoin(false);
+  const p = S.profile, xp = totalXP(), R = rankInfo(xp);
+  show(`${topbar('profile')}<main class="wrap stack">
+    <section class="sheet stack">
+      <div class="scorecard"><span class="avatar big" aria-hidden="true">${p.avatar}</span><div><h2 class="sc-nick" data-focus tabindex="-1">${esc(p.nick)}</h2><span class="team-tag" style="--tc:var(--t-${p.team})">${teamOf(p.team).name}</span></div></div>
+      <dl class="stats"><div><dt>Total XP</dt><dd>${fmtXP(xp)}</dd></div><div><dt>Rank</dt><dd>${R.name}</dd></div><div><dt>Longest streak</dt><dd>${S.bestStreak}</dd></div></dl>
+      <ol class="ranks">${RANKS.map(([at, name]) => `<li class="${xp >= at ? 'got' : ''}${name === R.name ? ' cur' : ''}"><span>${name}</span><span class="muted">${fmtXP(at)} XP</span></li>`).join('')}</ol>
+    </section>
+    <section class="sheet stack"><h2>Badges</h2>
+      <div class="badges">${BADGES.map(b => { const got = S.badges.includes(b.id); return `<div class="badge ${got ? 'got' : 'locked'}"><span class="bi" aria-hidden="true">${b.icon}</span><div><div class="bn">${b.name}${got ? '' : ' <span class="sr">(not earned yet)</span>'}</div><div class="bd2">${b.desc}</div></div></div>`; }).join('')}</div>
+    </section>
+    <section class="sheet stack"><h2>Accuracy by level</h2>
+      <div class="tablewrap"><table><thead><tr><th scope="col">Level</th><th scope="col">Best accuracy</th><th scope="col">Best XP</th><th scope="col">Stars</th></tr></thead><tbody>
+      ${LEVELS.map(L => { const r = S.levels[L.id]; return `<tr><th scope="row">${esc(L.name)}</th><td>${r ? pct(r.bestAcc) : '\u2013'}</td><td>${r ? fmtXP(r.bestXP) : '\u2013'}</td><td>${r ? `<span class="stars" aria-label="${starsFor(r.bestAcc)} of 3">${starStr(starsFor(r.bestAcc))}</span>` : '\u2013'}</td></tr>`; }).join('')}
+      </tbody></table></div>
+    </section>
+    <section class="sheet stack"><h2>Power-ups</h2>
+      <ul class="pulist">${Object.keys(POWERUPS).map(k => `<li><span class="pup">${POWERUPS[k].name}<b>${S.powerups[k]}</b></span><span>${POWERUPS[k].desc}</span></li>`).join('')}</ul>
+      <p class="help">Power-ups switch off during the Final Checkpoint.</p>
+    </section>
+    ${shareBlock()}
+  </main>`, bindShare);
+}
+function renderSettings() {
+  if (!S.profile) return renderJoin(false);
+  show(`${topbar('settings')}<main class="wrap stack"><section class="sheet stack">
+    <h2 data-focus tabindex="-1">Settings</h2>
+    <div class="fieldblock"><span class="lab" id="tl">Timers</span>
+      <div class="seg" role="group" aria-labelledby="tl">${[['normal', 'Normal'], ['extra', 'Extra time (2\u00D7)'], ['off', 'Off']].map(([v, l]) => `<button type="button" data-timer="${v}" aria-pressed="${S.settings.timer === v}">${l}</button>`).join('')}</div>
+      <p class="help">Extra time doubles every timer. With timers off there is no speed bonus.</p></div>
+    <div class="fieldblock"><label class="check"><input type="checkbox" id="unlockall" ${S.settings.unlockAll ? 'checked' : ''}> Unlock every level</label>
+      <p class="help">Turn this on when your SI leader moves the whole class ahead.</p></div>
+    <div class="fieldblock"><button type="button" class="btn" id="editp">Edit nickname, avatar or team</button></div>
+    <div class="fieldblock"><button type="button" class="btn danger" id="reset">Reset all progress</button>
+      <p class="help">Erases XP, badges, power-ups and exit ticket answers on this device.</p></div>
+  </section></main>`, () => {
+    $$('[data-timer]').forEach(b => b.addEventListener('click', () => { S.settings.timer = b.dataset.timer; save(); $$('[data-timer]').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+    $('#unlockall').addEventListener('change', e => { S.settings.unlockAll = e.target.checked; save(); });
+    $('#editp').addEventListener('click', () => renderJoin(true));
+    const r = $('#reset');
+    r.addEventListener('click', () => {
+      if (r.dataset.armed) { S = fresh(); session.streak = 0; save(); renderJoin(false); return; }
+      r.dataset.armed = '1'; r.textContent = 'Tap again to erase everything';
+      setTimeout(() => { if (r.isConnected) { delete r.dataset.armed; r.textContent = 'Reset all progress'; } }, 4000);
+    });
+  });
+}
+
+/* ---------- start ---------- */
+if (S.profile) renderMap(); else renderJoin(false);
+
+})();
+</script>
+</body>
+</html>
